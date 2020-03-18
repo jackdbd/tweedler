@@ -1,6 +1,6 @@
-(ns tweedler.core-test
+(ns tweedler.utils-test
   (:require [clojure.test :refer [deftest is testing]]
-            [tweedler.core :refer [escape-html]]))
+            [tweedler.utils :refer [escape-html]]))
 
 (deftest escapes-html
   (testing "Replaces < with &lt; and > with &gt;"

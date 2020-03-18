@@ -1,58 +1,7 @@
 (ns tweedler.core
-  (:require [net.cgrand.enlive-html :as html]
-            [compojure.core :refer [defroutes GET POST]]
-            [compojure.route :refer [resources]]
-            [ring.adapter.jetty :as jetty]
+  (:require [ring.adapter.jetty :as jetty]
             [ring.middleware.params :refer [wrap-params]]
-            [markdown.core :refer [md-to-html-string]]
-            [clojure.string :refer [escape]]))
-
-(defrecord Tweed [title content])
-
-(defprotocol TweedStore
-  (get-tweeds [store])
-  (put-tweed! [store tweed]))
-
-(defrecord AtomStore [data])
-
-(extend-protocol TweedStore
-  AtomStore
-  (get-tweeds [store]
-    "Get all Tweeds."
-    (get @(:data store) :tweeds))
-  (put-tweed! [store tweed]
-    "Insert a new Tweed. We use conj so the newest Tweed shows up first."
-    (swap! (:data store)
-           update-in [:tweeds] conj tweed)))
-
-(def store (->AtomStore (atom {:tweeds '()})))
-
-;; (get-tweeds store)
-
-;; (put-tweed! store (->Tweed "Test title" "test content"))
-
-(html/defsnippet tweed-template "templates/index.html" [[:article.tweed html/first-of-type]]
-  [tweed]
-  [:.title] (html/html-content (:title tweed))
-  [:.content] (html/html-content (md-to-html-string(:content tweed))))
-  
-(html/deftemplate index-template "templates/index.html"
-  [tweeds]
-  [:section.tweeds] (html/content (map tweed-template tweeds))
-  [:form] (html/set-attr :method "post" :action "/"))
-
-(defn escape-html [^String s]
-  (escape s {\> "&gt;" \< "&lt;"}))
-
-(defn handle-create-tweed [{{title "title" content "content"} :params}]
-  (put-tweed! store (->Tweed (escape-html title) (escape-html content)))
-  {:body "" :status 302 :headers {"Location" "/"}})
-  
-(defroutes app-routes
-  (GET "/" [] (index-template (get-tweeds store)))
-  (POST "/" request (handle-create-tweed request))
-  (resources "/css" {:root "/css"})
-  (resources "/img" {:root "/img"}))
+            [tweedler.routes :refer [app-routes]]))
 
 (def app (-> app-routes
              (wrap-params)))
