@@ -1,5 +1,6 @@
 (ns tweedler.store
-  (:require [tweedler.tweed :refer [->Tweed]]))
+  (:require [taoensso.timbre :as timbre :refer [info]]
+            [tweedler.tweed :refer [->Tweed]]))
 
 (defprotocol TweedStore
   (get-tweeds [store])
@@ -10,10 +11,15 @@
 (extend-protocol TweedStore
   AtomStore
   (get-tweeds [store]
-    (get @(:data store) :tweeds))
+              "Get all Tweeds in a store."
+              (info "get-tweeds from store " store)
+              (get @(:data store) :tweeds))
   (put-tweed! [store tweed]
-              "We use conj so the newest Tweed shows up first."
+              "Create a new Tweed in the store."
+              (let [{:keys [title content]} tweed] 
+                (info "put-tweed" "[title:" title "; characters:"(count content)"]"))
               (swap! (:data store)
+                     ;;  We use conj so the newest Tweed shows up first.
                      update-in [:tweeds] conj tweed)))
 
 (def store (->AtomStore (atom {:tweeds '()})))
