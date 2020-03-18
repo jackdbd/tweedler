@@ -2,7 +2,8 @@
   (:require [net.cgrand.enlive-html :as html]
             [compojure.core :refer [defroutes GET POST]]
             [compojure.route :refer [resources]]
-            [ring.adapter.jetty :as jetty]))
+            [ring.adapter.jetty :as jetty]
+            [ring.middleware.params :refer [wrap-params]]))
 
 (defrecord Tweed [title content])
 
@@ -35,15 +36,21 @@
   
 (html/deftemplate index-template "templates/index.html"
   [tweeds]
-  [:section.tweeds] (html/content (map tweed-template tweeds)))
-  
-(index-template (get-tweeds store))
+  [:section.tweeds] (html/content (map tweed-template tweeds))
+  [:form] (html/set-attr :method "post" :action "/"))
 
-(defroutes app
+(defn handle-create-tweed [{{title "title" content "content"} :params}]
+  (put-tweed! store (->Tweed title content))
+  {:body "" :status 302 :headers {"Location" "/"}})
+  
+(defroutes app-routes
   (GET "/" [] (index-template (get-tweeds store)))
-  (POST "/" request "TODO")
+  (POST "/" request (handle-create-tweed request))
   (resources "/css" {:root "/css"})
   (resources "/img" {:root "/img"}))
+
+(def app (-> app-routes
+             (wrap-params)))
 
 ;; Use #'app (which stands for (var app)) to avoid stopping/restarting the jetty
 ;; webserver. We still have to refresh the browser though).
