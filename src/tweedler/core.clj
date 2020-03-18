@@ -3,7 +3,9 @@
             [compojure.core :refer [defroutes GET POST]]
             [compojure.route :refer [resources]]
             [ring.adapter.jetty :as jetty]
-            [ring.middleware.params :refer [wrap-params]]))
+            [ring.middleware.params :refer [wrap-params]]
+            [markdown.core :refer [md-to-html-string]]
+            [clojure.string :refer [escape]]))
 
 (defrecord Tweed [title content])
 
@@ -32,15 +34,18 @@
 (html/defsnippet tweed-template "templates/index.html" [[:article.tweed html/first-of-type]]
   [tweed]
   [:.title] (html/html-content (:title tweed))
-  [:.content] (html/html-content (:content tweed)))
+  [:.content] (html/html-content (md-to-html-string(:content tweed))))
   
 (html/deftemplate index-template "templates/index.html"
   [tweeds]
   [:section.tweeds] (html/content (map tweed-template tweeds))
   [:form] (html/set-attr :method "post" :action "/"))
 
+(defn escape-html [^String s]
+  (escape s {\> "&gt;" \< "&lt;"}))
+
 (defn handle-create-tweed [{{title "title" content "content"} :params}]
-  (put-tweed! store (->Tweed title content))
+  (put-tweed! store (->Tweed (escape-html title) (escape-html content)))
   {:body "" :status 302 :headers {"Location" "/"}})
   
 (defroutes app-routes
