@@ -1,7 +1,8 @@
 (ns tweedler.core-test
-  (:require [clojure.test :refer :all]
-            [tweedler.core :refer :all]))
+  (:require [clojure.test :refer [deftest is testing]]
+            [tweedler.core :refer [escape-html]]))
 
-(deftest a-test
-  (testing "FIXME, I fail."
-    (is (= 0 1))))
+(deftest escapes-html
+  (testing "Replaces < with &lt; and > with &gt;"
+    (is (= "&lt;script&gt;alert('Hi')&lt;/script&gt;"
+           (escape-html "<script>alert('Hi')</script>")))))
