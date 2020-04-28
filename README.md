@@ -57,7 +57,14 @@ lein cloverage
 
 ## Build
 
+Create a standalone, compiled ahead-of-time `.jar` file with:
+
 ```sh
 lein uberjar
+```
+
+then run it with:
+
+```sh
 java -jar target/uberjar/tweedler-standalone.jar
 ```

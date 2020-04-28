@@ -41,13 +41,14 @@
   ; Non-code files included in classpath/jar.
   :resource-paths ["resources"]
   
-  ;; Skip Ahead Of Time compilation to make it easy to deploy on a PaaS.
-  ;; https://stackoverflow.com/questions/11174459/reason-for-skipping-aot
-  :main ^:skip-aot tweedler.core
+  :main tweedler.core
   :target-path "target/%s"
   
-  :profiles {:dev {:aliases {"run-dev" ["trampoline" "run" "-m" "tweedler.core/run-dev"]}
-                   :dependencies [[pjstadig/humane-test-output "0.10.0"]]
-                   :plugins [[com.jakemccrary/lein-test-refresh "0.24.1"]
-                             [jonase/eastwood "0.3.5"]]}
-             :uberjar {:uberjar-name "tweedler-standalone.jar"}})
+  :profiles
+  {:dev {:aliases {"run-dev" ["trampoline" "run" "-m" "tweedler.core/run-dev"]}
+         :dependencies [[pjstadig/humane-test-output "0.10.0"]]
+         :plugins [[com.jakemccrary/lein-test-refresh "0.24.1"]
+                   [jonase/eastwood "0.3.5"]]}
+  
+   ;; Compile everything with Ahead Of Time compilation
+   :uberjar {:aot :all :uberjar-name "tweedler-standalone.jar"}})

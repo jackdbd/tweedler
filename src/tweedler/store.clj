@@ -16,21 +16,21 @@
   AtomStore
 
   (get-tweeds
-   [store]
-   (debug "get-tweeds")
-   (get @(:data store) :tweeds))
+    [store]
+    (debug "get-tweeds")
+    (get @(:data store) :tweeds))
 
   (put-tweed!
-   [store tweed]
-   (let [{:keys [title content]} tweed]
-     (debug "put-tweed!" "[title:" title "; characters:" (count content) "]"))
+    [store tweed]
+    (let [{:keys [title content]} tweed]
+      (debug "put-tweed!" "[title:" title "; characters:" (count content) "]"))
    ;; We use conj so the newest Tweed shows up first.
-   (swap! (:data store) update-in [:tweeds] conj tweed))
+    (swap! (:data store) update-in [:tweeds] conj tweed))
 
   (reset-tweeds!
-   [store]
-   (debug "reset-tweeds!")
-   (swap! (:data store) assoc-in [:tweeds] [])))
+    [store]
+    (debug "reset-tweeds!")
+    (swap! (:data store) assoc-in [:tweeds] [])))
 
 (defn- init-store
   "Initialize a store."
