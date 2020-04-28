@@ -1,44 +1,63 @@
 # tweedler
 
-FIXME: description
+A simple app just to start practicing Clojure.
 
-## Installation
+## Development
 
-Download from http://example.com/FIXME.
+This project uses [Leiningen 2.0](https://github.com/technomancy/leiningen).
 
-## Usage
+Code formatting with [cljfmt](https://github.com/weavejester/cljfmt) and [lein-cljfmt](https://clojars.org/lein-cljfmt) Leiningen plugin.
 
-FIXME: explanation
+```sh
+lein cljfmt check
+lein cljfmt fix
+```
 
-    $ java -jar tweedler-0.1.0-standalone.jar [args]
+Linting with [eastwood](https://github.com/jonase/eastwood).
 
-## Options
+```sh
+lein eastwood
+```
 
-FIXME: listing of options this app accepts.
+Run either with:
 
-## Examples
+```sh
+lein run
+```
 
-...
+or with [Lein-Ring](https://github.com/weavejester/lein-ring) Leiningen plugin:
 
-### Bugs
+```sh
+lein ring server
+```
 
-...
+Otherwise, run it in the REPL, so you can start and stop the server:
 
-### Any Other Sections
-### That You Think
-### Might be Useful
+```sh
+lein repl
 
-## License
+# In the REPL
+tweedler.core=> (run-server 3000)
+tweedler.core=> (stop-server)
+```
 
-Copyright © 2020 FIXME
+## Test
 
-This program and the accompanying materials are made available under the
-terms of the Eclipse Public License 2.0 which is available at
-http://www.eclipse.org/legal/epl-2.0.
+Run all tests in "watch mode" with [lein-test-refresh](https://github.com/jakemcc/lein-test-refresh):
 
-This Source Code may also be made available under the following Secondary
-Licenses when the conditions for such availability set forth in the Eclipse
-Public License, v. 2.0 are satisfied: GNU General Public License as published by
-the Free Software Foundation, either version 2 of the License, or (at your
-option) any later version, with the GNU Classpath Exception which is available
-at https://www.gnu.org/software/classpath/license.html.
+```sh
+lein test-refresh
+```
+
+To check test coverage, I use [cloverage](https://github.com/cloverage/cloverage):
+
+```sh
+lein cloverage
+```
+
+## Build
+
+```sh
+lein uberjar
+java -jar target/uberjar/tweedler-standalone.jar
+```

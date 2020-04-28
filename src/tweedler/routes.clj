@@ -1,8 +1,10 @@
 (ns tweedler.routes
-  (:require [net.cgrand.enlive-html :as html]
-            [compojure.core :refer [defroutes GET POST]]
+  "This namespace defines the application routes and the HTML template
+  associated to each one."
+  (:require [compojure.core :refer [defroutes GET POST]]
             [compojure.route :refer [resources]]
             [markdown.core :refer [md-to-html-string]]
+            [net.cgrand.enlive-html :as html]
             [tweedler.handlers :refer [handle-create-tweed]]
             [tweedler.store :refer [store get-tweeds]]))
 

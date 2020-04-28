@@ -1,8 +1,16 @@
 (ns tweedler.handlers-test
   (:require [clojure.test :refer [deftest is testing]]
-            [tweedler.handlers :refer [handle-create-tweed]]))
+            [ring.util.response :refer [redirect]]
+            [tweedler.handlers :refer [handle-create-tweed]]
+            [tweedler.store :refer [get-tweeds reset-tweeds! store]]))
 
-;; (deftest creates-a-tweed
-;;   (testing "FIXME: handle the creation of a tweed"
-;;     (is (= 123
-;;            (handle-create-tweed [:params {:title "Some title" :content "Some content"}])))))
+(deftest handle-create-tweed-test
+  (reset-tweeds! store)
+  (def req {:params {"title" "Some title" "content" "Some content"}})
+  (let [tweeds-before (count (get-tweeds store))]
+    (testing "creates a tweed and redirects to /"
+      (is (= (redirect "/")
+             (handle-create-tweed req)))
+      (let [tweeds-after (count (get-tweeds store))]
+        (is (= tweeds-after
+               (inc tweeds-before)))))))
