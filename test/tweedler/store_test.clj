@@ -1,7 +1,5 @@
 (ns tweedler.store-test
   (:require [clojure.test :refer [deftest is testing]]
-            [ring.util.response :refer [redirect]]
-            [tweedler.handlers :refer [handle-create-tweed]]
             [tweedler.store :refer [get-tweeds reset-tweeds! seed-store store]]))
 
 (deftest seed-store-test
