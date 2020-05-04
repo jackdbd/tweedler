@@ -1,17 +1,12 @@
 (ns tweedler.handlers
   "This namespace contains the handlers invoked when visiting the app routes."
   (:require [ring.util.response :refer [redirect]]
-            ;; [clojure.string :as s]
             [markdown.core :refer [md-to-html-string]]
             [net.cgrand.enlive-html :as html]
             [taoensso.timbre :as timbre :refer [info]]
             [tweedler.store :refer [get-tweeds put-tweed! seed-tweeds! store-instance]]
             [tweedler.tweed :refer [->Tweed]]
             [tweedler.utils :refer [escape-html]]))
-
-;; https://stackoverflow.com/questions/30763609/clojure-partly-change-an-attribute-value-in-enlive
-;; (defn update-attr [attr f & args]
-;;   (fn [node] (apply update-in node [:attrs attr] f args)))
 
 (defonce ^:private store (store-instance "Atom Store for Tweeds"))
 
