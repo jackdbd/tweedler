@@ -5,9 +5,9 @@
             [tweedler.handlers :as h]))
 
 (defroutes app-routes
-  (GET "/" _ (h/home-handler))
+  (GET "/" req (h/home-handler req))
   (POST "/" req (h/create-tweed req))
-  (POST "/seed" _ (h/seed-tweeds))
+  (POST "/seed" req (h/seed-tweeds req))
   (context "/admin" []
     (GET "/login" [] "Logging in")
     (GET "/logout" [] "Logging out"))

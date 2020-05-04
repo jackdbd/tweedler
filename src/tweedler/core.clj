@@ -5,11 +5,14 @@
    [ring.adapter.jetty :as jetty]
    [ring.middleware.defaults :refer [site-defaults wrap-defaults]]
    [taoensso.timbre :as timbre :refer [info]]
-   [tweedler.routes :refer [app-routes]]))
+   [tweedler.middleware :refer [wrap-store]]
+   [tweedler.routes :refer [app-routes]]
+   [tweedler.store :refer [make-store]]))
 
 (def handler
   "The Ring main handler (i.e. the Ring application)."
   (-> app-routes
+      (wrap-store (make-store "app-store"))
       ;; TODO: re-enable :anti-forgery to look for CSRF token in
       ;;       POST/PUT/DELETE requests.
       (wrap-defaults (assoc-in site-defaults [:security :anti-forgery] false))))

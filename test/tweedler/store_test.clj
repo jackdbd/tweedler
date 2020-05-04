@@ -1,8 +1,8 @@
 (ns tweedler.store-test
   (:require [clojure.test :refer [deftest is testing]]
-            [tweedler.store :refer [get-tweeds reset-tweeds! seed-tweeds! store-instance]]))
+            [tweedler.store :refer [get-tweeds reset-tweeds! seed-tweeds! make-store]]))
 
-(defonce ^:private store (store-instance "Atom Test Store"))
+(defonce ^:private store (make-store "Atom Test Store"))
 
 (deftest seed-store-test
   (reset-tweeds! store)

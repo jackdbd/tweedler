@@ -4,11 +4,11 @@
             [net.cgrand.enlive-html :as html]
             [ring.util.response :refer [redirect]]
             [taoensso.timbre :as timbre :refer [info]]
-            [tweedler.store :refer [get-tweeds put-tweed! seed-tweeds! store-instance]]
+            [tweedler.store :refer [get-tweeds put-tweed! seed-tweeds!]]
             [tweedler.tweed :refer [->Tweed]]
             [tweedler.utils :refer [escape-html]]))
 
-(defonce ^:private store (store-instance "Atom Store for Tweeds"))
+;; (defonce ^:private store (make-store "Atom Store for Tweeds"))
 
 (html/deftemplate not-found-template "templates/404.html"
   [href]
@@ -27,21 +27,24 @@
 
 (defn home-handler
   "Return the home page."
-  []
+  [{store :store}]
   (index-template (get-tweeds store)))
 
 (defn create-tweed
   "Extract `title` and `content` from the Ring request, add a new tweed in the
    Tweed store (mutation), then redirect to /."
-  [{{title "title" content "content"} :form-params}]
-  (info "create-tweed [title:" title "; content:" content)
-  (put-tweed! store (->Tweed (escape-html title) (escape-html content)))
-  (info "Redirect to /")
-  (redirect "/" 302))
+  [req]
+  (let [form-params (:form-params req)
+        title (get form-params "title")
+        content (get-in req [:form-params "content"])]
+    (info "create-tweed [title:" title "; content:" content "]")
+    (put-tweed! (:store req) (->Tweed (escape-html title) (escape-html content)))
+    (info "Redirect to /")
+    (redirect "/" 302)))
 
 (defn seed-tweeds
   "Seed the store with a few tweeds, then redirect to /."
-  []
+  [{store :store}]
   (info "seed-tweeds")
   (seed-tweeds! store)
   (info "Redirect to /")

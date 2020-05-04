@@ -39,7 +39,7 @@
     (put-tweed! this (->Tweed "Second tweed" "test content 2"))
     (put-tweed! this (->Tweed "Third tweed" "test content 3"))))
 
-(defn store-instance
+(defn make-store
   "Instantiate a store that holds some state in an atom."
   [name]
   ; https://guide.clojure.style/#record-constructors
