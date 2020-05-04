@@ -1,5 +1,7 @@
 # tweedler
 
+[![Build Status](https://travis-ci.org/jackdbd/tweedler.svg?branch=master)](https://travis-ci.org/jackdbd/tweedler)
+
 A simple app just to start practicing Clojure.
 
 ## Development
