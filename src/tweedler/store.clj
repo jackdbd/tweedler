@@ -14,30 +14,30 @@
 
 (extend-protocol TweedStore
   AtomStore
-  
+
   (get-tweeds
-   [this]
+    [this]
     (debug "get-tweeds")
     (get @(:data this) :tweeds))
-  
+
   (put-tweed!
     [this tweed]
     (let [{:keys [title content]} tweed]
       (debug "put-tweed!" "[title:" title "; characters:" (count content) "]")
       ;; We use conj so the newest Tweed shows up first.
       (swap! (:data this) update-in [:tweeds] conj tweed)))
-  
+
   (reset-tweeds!
-   [this]
+    [this]
     (debug "reset-tweeds!")
     (swap! (:data this) assoc-in [:tweeds] []))
-  
+
   (seed-tweeds!
-   [this]
-   (debug "seed-tweeds!")
-   (put-tweed! this (->Tweed "First tweed" "test content 1"))
-   (put-tweed! this (->Tweed "Second tweed" "test content 2"))
-   (put-tweed! this (->Tweed "Third tweed" "test content 3"))))
+    [this]
+    (debug "seed-tweeds!")
+    (put-tweed! this (->Tweed "First tweed" "test content 1"))
+    (put-tweed! this (->Tweed "Second tweed" "test content 2"))
+    (put-tweed! this (->Tweed "Third tweed" "test content 3"))))
 
 (defn store-instance
   "Instantiate a store that holds some state in an atom."

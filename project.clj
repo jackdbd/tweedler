@@ -33,7 +33,7 @@
                  [ring/ring-defaults "0.3.2"]]
 
   ;; What to do in the case of dependencies' version conflicts.
-  ;; :pedantic? :warn
+  ; :pedantic? :warn
   
   ;; Configuration for lein-ring plugin.
   :ring {:handler tweedler.core/handler}
