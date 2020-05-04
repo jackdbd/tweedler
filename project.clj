@@ -42,4 +42,6 @@
   :resource-paths ["resources"]
   
   :main tweedler.core
-  :target-path "target/%s")
+  :target-path "target/%s"
+  
+  :aliases {"test-all" ["with-profile" "default:+1.9:+1.10" "test"]})
