@@ -42,4 +42,5 @@
 (defn store-instance
   "Instantiate a store that holds some state in an atom."
   [name]
-  (AtomStore. name (atom {:tweeds '()})))
+  ; https://guide.clojure.style/#record-constructors
+  (->AtomStore name (atom {:tweeds '()})))

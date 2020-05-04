@@ -44,4 +44,10 @@
   :main tweedler.core
   :target-path "target/%s"
   
-  :aliases {"test-all" ["with-profile" "default:+1.9:+1.10" "test"]})
+  :aliases {"test-all" ["with-profile" "default:+1.8:+1.9:+1.10" "test"]
+            "tr" ["trampoline" "run" "-m" "tweedler.core/-main"]}
+  
+  :profiles {:uberjar {:aot :all :uberjar-name "tweedler-standalone.jar"}
+             :1.8  {:dependencies [[org.clojure/clojure "1.8.0"]]}
+             :1.9  {:dependencies [[org.clojure/clojure "1.9.0"]]}
+             :1.10  {:dependencies [[org.clojure/clojure "1.10.1"]]}})

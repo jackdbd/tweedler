@@ -1,8 +1,8 @@
 (ns tweedler.handlers
   "This namespace contains the handlers invoked when visiting the app routes."
-  (:require [ring.util.response :refer [redirect]]
-            [markdown.core :refer [md-to-html-string]]
+  (:require [markdown.core :refer [md-to-html-string]]
             [net.cgrand.enlive-html :as html]
+            [ring.util.response :refer [redirect]]
             [taoensso.timbre :as timbre :refer [info]]
             [tweedler.store :refer [get-tweeds put-tweed! seed-tweeds! store-instance]]
             [tweedler.tweed :refer [->Tweed]]
@@ -51,8 +51,3 @@
   "Return a 404 page."
   []
   (not-found-template "http://localhost:3000/"))
-
-(defn get-store
-  "Expose the store (use it only in the tests)."
-  []
-  store)

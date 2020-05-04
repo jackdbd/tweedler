@@ -1,7 +1,5 @@
 (ns tweedler.core
   "Tweedler - a simple app to start practicing Clojure."
-  ; Tell the clojure compiler to generate a class for this namespace using the
-  ; -main method as entry point.
   (:gen-class)
   (:require
    [ring.adapter.jetty :as jetty]
@@ -12,7 +10,8 @@
 (def handler
   "The Ring main handler (i.e. the Ring application)."
   (-> app-routes
-      ;; TODO: re-enable :anti-forgery to look for CSRF token in POST/PUT/DELETE requests
+      ;; TODO: re-enable :anti-forgery to look for CSRF token in
+      ;;       POST/PUT/DELETE requests.
       (wrap-defaults (assoc-in site-defaults [:security :anti-forgery] false))))
 
 ;; Define a singleton that acts as the container for a Jetty server (note that
@@ -21,7 +20,6 @@
 
 (defn start-server
   "Create a Jetty `Server`, run it, and store it in an atom.
-
   We use #'handler (which stands for (var handler)) to avoid stopping/restarting
   the jetty webserver every time we make changes to the Ring handler. We still
   have to refresh the browser though).

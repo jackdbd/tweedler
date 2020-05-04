@@ -1,8 +1,15 @@
 (ns tweedler.handlers-test
   (:require [clojure.test :refer [deftest is testing]]
             [ring.util.response :refer [redirect]]
-            [tweedler.handlers :refer [create-tweed get-store seed-tweeds]]
+            [tweedler.handlers :refer [create-tweed seed-tweeds]]
             [tweedler.store :refer [get-tweeds reset-tweeds!]]))
+
+(defn- get-store
+  "Access the store (private variable) from the handlers namespace.
+   
+   https://guide.clojure.style/#access-private-var"
+  []
+  @#'tweedler.handlers/store)
 
 (deftest create-tweed-test
   (reset-tweeds! (get-store))
