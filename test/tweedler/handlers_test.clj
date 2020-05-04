@@ -13,8 +13,8 @@
 
 (deftest create-tweed-test
   (reset-tweeds! (get-store))
-  (def req {:form-params {"title" "Some title" "content" "Some content"}})
-  (let [tweeds-before (count (get-tweeds (get-store)))]
+  (let [req {:form-params {"title" "Some title" "content" "Some content"}}
+        tweeds-before (count (get-tweeds (get-store)))]
     (testing "creates a tweed and redirects to /"
       (is (= (redirect "/")
              (create-tweed req)))
@@ -23,7 +23,6 @@
 
 (deftest seed-tweeds-test
   (reset-tweeds! (get-store))
-  (def req {})
   (let [tweeds-before (count (get-tweeds (get-store)))]
     (testing "seed the store with 3 tweeds and redirects to /"
       (is (= (redirect "/")

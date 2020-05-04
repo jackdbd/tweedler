@@ -9,8 +9,10 @@
   :license {:name "MIT License"
             :url "https://choosealicense.com/licenses/mit/"}
 
-  ;; Warns users of earlier versions of Leiningen.
+  ;; Warn me of earlier versions of Leiningen and tell TravisCI to use this one.
   :min-lein-version "2.0.0"
+  
+  :global-vars {*warn-on-reflection* true}
 
   :dependencies [;; Logging
                  [com.taoensso/timbre "4.10.0"]
