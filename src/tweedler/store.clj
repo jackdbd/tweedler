@@ -4,44 +4,42 @@
             [tweedler.tweed :refer [->Tweed]]))
 
 (defprotocol TweedStore
-  (get-tweeds [store])
+  "An abstraction of a store that holds the application's state."
+  (get-tweeds [this] "Retrieve all tweeds from the store.")
+  (put-tweed! [this tweed] "Insert a new tweed in the store.")
+  (reset-tweeds! [this] "Delete all tweeds from the store.")
+  (seed-tweeds! [this] "Seed the store with a few tweeds."))
 
-  (put-tweed! [store tweed])
-
-  (reset-tweeds! [store]))
-
-(defrecord AtomStore [data])
+(defrecord AtomStore [^String name data])
 
 (extend-protocol TweedStore
   AtomStore
-
+  
   (get-tweeds
-    [store]
+   [this]
     (debug "get-tweeds")
-    (get @(:data store) :tweeds))
-
+    (get @(:data this) :tweeds))
+  
   (put-tweed!
-    [store tweed]
+    [this tweed]
     (let [{:keys [title content]} tweed]
-      (debug "put-tweed!" "[title:" title "; characters:" (count content) "]"))
-   ;; We use conj so the newest Tweed shows up first.
-    (swap! (:data store) update-in [:tweeds] conj tweed))
-
+      (debug "put-tweed!" "[title:" title "; characters:" (count content) "]")
+      ;; We use conj so the newest Tweed shows up first.
+      (swap! (:data this) update-in [:tweeds] conj tweed)))
+  
   (reset-tweeds!
-    [store]
+   [this]
     (debug "reset-tweeds!")
-    (swap! (:data store) assoc-in [:tweeds] [])))
+    (swap! (:data this) assoc-in [:tweeds] []))
+  
+  (seed-tweeds!
+   [this]
+   (debug "seed-tweeds!")
+   (put-tweed! this (->Tweed "First tweed" "test content 1"))
+   (put-tweed! this (->Tweed "Second tweed" "test content 2"))
+   (put-tweed! this (->Tweed "Third tweed" "test content 3"))))
 
-(defn- init-store
-  "Initialize a store."
-  []
-  (->AtomStore (atom {:tweeds '()})))
-
-(defonce store (init-store))
-
-(defn seed-store
-  "Add some fakes to test the app."
-  []
-  (put-tweed! store (->Tweed "First tweed" "test content 1"))
-  (put-tweed! store (->Tweed "Second tweed" "test content 2"))
-  (put-tweed! store (->Tweed "Third tweed" "test content 3")))
+(defn store-instance
+  "Instantiate a store that holds some state in an atom."
+  [name]
+  (AtomStore. name (atom {:tweeds '()})))

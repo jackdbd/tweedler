@@ -1,27 +1,13 @@
 (ns tweedler.routes
-  "This namespace defines the application routes and the HTML template
-  associated with each one."
-  (:require [compojure.core :refer [defroutes GET POST]]
-            [compojure.route :refer [resources]]
-            [markdown.core :refer [md-to-html-string]]
-            [net.cgrand.enlive-html :as html]
-            [tweedler.handlers :refer [create-tweed seed-tweeds]]
-            [tweedler.store :refer [store get-tweeds]]))
-
-(html/defsnippet tweed-template "templates/index.html" [[:article.tweed html/first-of-type]]
-  [tweed]
-  [:.title] (html/html-content (:title tweed))
-  [:.content] (html/html-content (md-to-html-string (:content tweed))))
-
-(html/deftemplate index-template "templates/index.html"
-  [tweeds]
-  [:section.tweeds] (html/content (map tweed-template tweeds))
-  [:form.new-tweed] (html/set-attr :method "post" :action "/")
-  [:form.seed-tweeds] (html/set-attr :method "post" :action "/seed"))
+  "This namespace maps the application routes to the request handlers."
+  (:require [compojure.core :refer [defroutes ANY GET POST]]
+            [compojure.route :as route :refer [resources]]
+            [tweedler.handlers :as h]))
 
 (defroutes app-routes
-  (GET "/" [] (index-template (get-tweeds store)))
-  (POST "/" request (create-tweed request))
-  (POST "/seed" request (seed-tweeds request))
+  (GET "/" _ (h/home-handler))
+  (POST "/" req (h/create-tweed req))
+  (POST "/seed" _ (h/seed-tweeds))
+  (ANY "*" _ (h/not-found-handler))
   (resources "/css" {:root "/css"})
   (resources "/img" {:root "/img"}))
