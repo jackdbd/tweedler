@@ -2,7 +2,7 @@
 
   ;; The description text is searchable from repositories like Clojars.
   :description "A simple app just to start practicing Clojure."
-  :url "http://example.com/FIXME"
+  :url "https://github.com/jackdbd/tweedler"
 
   ;; Project's license, and whether it is OK for public repositories to host
   ;; this project's artifacts.
@@ -22,6 +22,9 @@
                  
                  ;; Server-side templating
                  [enlive "1.1.6"]
+                 
+                 ;; Access environment variables
+                 [environ "1.1.0"]
                  
                  ;; Markdown parsing
                  [markdown-clj "1.10.4"]
@@ -45,6 +48,7 @@
   
   :main tweedler.core
   :target-path "target/%s"
+  :uberjar-name "tweedler-standalone.jar"
   
   :aliases {"test-all" ["with-profile" "default:+1.8:+1.9:+1.10" "test"]
             "tr" ["trampoline" "run" "-m" "tweedler.core/-main"]}

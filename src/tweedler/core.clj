@@ -2,6 +2,7 @@
   "Tweedler - a simple app to start practicing Clojure."
   (:gen-class)
   (:require
+   [environ.core :refer [env]]
    [ring.adapter.jetty :as jetty]
    [ring.middleware.defaults :refer [site-defaults wrap-defaults]]
    [taoensso.timbre :as timbre :refer [info]]
@@ -40,6 +41,9 @@
   (.stop @webserver))
 
 (defn -main
-  "The entry-point for 'lein run'"
-  []
-  (start-server 3000))
+  "The entry-point for 'lein run'
+   GOTCHA: avoid hardcoding a port number when deploying on Heroku.
+   https://stackoverflow.com/a/15693371/3036129"
+  [& [port]]
+  (let [port (Integer. (or port (env :port) 5000))]
+    (start-server port)))
