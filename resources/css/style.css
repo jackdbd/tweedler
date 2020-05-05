@@ -34,3 +34,7 @@ article, .make-tweed form{
 .make-tweed form{
     max-width: 400px;
 }
+
+section.tweeds {
+    font-family: 'Permanent Marker', cursive;
+}

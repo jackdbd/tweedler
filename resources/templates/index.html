@@ -1,58 +1,56 @@
 <!doctype html>
 <html>
-    <head>
-        <title>Welcome to Twiddler</title>
-        <link href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css" rel="stylesheet" />
-        <link href="https://cdnjs.cloudflare.com/ajax/libs/skeleton/2.0.4/skeleton.min.css" rel="stylesheet" />
-        <link href="https://fonts.googleapis.com/css2?family=Permanent+Marker&display=swap" rel="stylesheet">
-        <link href="css/style.css" rel="stylesheet" />
-        <style>
-            section.tweeds {
-                font-family: 'Permanent Marker', cursive;
-            }
-        </style>
-    </head>
-    <body>
-        <header>
-            <h1>Tweedler</h1>
-        </header>
-        <main class="container">
-            <div class="row">
-                <div class="four columns">
-                    <h3>Create a Tweed</h3>
-                    <section class="make-tweed">
-                        <form class="new-tweed">
-                            <fieldset>
-                                <label for="title">Title</label>
-                                <input type="text" name="title" class="u-full-width">
-                                <label for="content">Body</label>
-                                <textarea name="content" class="u-full-width"></textarea>
-                                <input type="submit" class="button-primary">
-                            </fieldset>
-                        </form>
-                    </section>
-                    <h3>Seed tweeds</h3>
-                    <section class="make-tweed">
-                        <form class="seed-tweeds">
-                            <p>Seed the store with a few tweeds.</p>
-                            <fieldset>
-                                <input type="submit" class="button-primary">
-                            </fieldset>
-                        </form>
-                    </section>
-                </div>
-                <div class="eight columns">
-                    <h3>Latest Tweeds</h3>
-                    <section class="tweeds">
-                        <article class="tweed">
-                            <h4 class="title">Tweedle title placeholder</h4>
-                            <div class="content">
-                                <p>Tweedle content placeholder</p>
-                            </div>
-                        </article>
-                    </section>
-                </div>
+
+<head>
+    <title>Welcome to Twiddler</title>
+    <link href="css/normalize.css" rel="stylesheet" type="text/css" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/skeleton/2.0.4/skeleton.min.css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Permanent+Marker&display=swap" rel="stylesheet">
+    <link href="css/style.css" rel="stylesheet" type="text/css" />
+</head>
+
+<body>
+    <header>
+        <h1>Tweedler</h1>
+    </header>
+    <main class="container">
+        <div class="row">
+            <div class="four columns">
+                <h3>Create a Tweed</h3>
+                <section class="make-tweed">
+                    <form class="new-tweed">
+                        <fieldset>
+                            <label for="title">Title</label>
+                            <input type="text" name="title" class="u-full-width">
+                            <label for="content">Body</label>
+                            <textarea name="content" class="u-full-width"></textarea>
+                            <input type="submit" class="button-primary">
+                        </fieldset>
+                    </form>
+                </section>
+                <h3>Seed tweeds</h3>
+                <section class="make-tweed">
+                    <form class="seed-tweeds">
+                        <p>Seed the store with a few tweeds.</p>
+                        <fieldset>
+                            <input type="submit" class="button-primary">
+                        </fieldset>
+                    </form>
+                </section>
             </div>
-        </main>
-    </body>
+            <div class="eight columns">
+                <h3>Latest Tweeds</h3>
+                <section class="tweeds">
+                    <article class="tweed">
+                        <h4 class="title">Tweedle title placeholder</h4>
+                        <div class="content">
+                            <p>Tweedle content placeholder</p>
+                        </div>
+                    </article>
+                </section>
+            </div>
+        </div>
+    </main>
+</body>
+
 </html>
