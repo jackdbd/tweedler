@@ -53,7 +53,18 @@
   :aliases {"test-all" ["with-profile" "default:+1.8:+1.9:+1.10" "test"]
             "tr" ["trampoline" "run" "-m" "tweedler.core/-main"]}
   
-  :profiles {:uberjar {:aot :all :uberjar-name "tweedler-standalone.jar"}
+  :profiles {:dev {:dependencies [[io.aviso/pretty "0.1.37"]
+                                  [pjstadig/humane-test-output "0.10.0"]
+                                  [ring/ring-mock "0.4.0"]]
+                   :injections [(require 'pjstadig.humane-test-output)
+                                (pjstadig.humane-test-output/activate!)]
+                   :middleware [io.aviso.lein-pretty/inject]
+                   :plugins [[com.jakemccrary/lein-test-refresh "0.24.1"]
+                             [io.aviso/pretty "0.1.37"]
+                             [lein-ring "0.12.5"]]}
+             
+             :uberjar {:aot :all :uberjar-name "tweedler-standalone.jar"}
+             
              :1.8  {:dependencies [[org.clojure/clojure "1.8.0"]]}
              :1.9  {:dependencies [[org.clojure/clojure "1.9.0"]]}
              :1.10  {:dependencies [[org.clojure/clojure "1.10.1"]]}})
