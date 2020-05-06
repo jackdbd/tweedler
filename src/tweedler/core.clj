@@ -16,7 +16,7 @@
       (wrap-store (make-store "app-store"))
       ;; TODO: re-enable :anti-forgery to look for CSRF token in
       ;;       POST/PUT/DELETE requests.
-      (wrap-defaults (assoc-in site-defaults [:security :anti-forgery] false))))
+      (wrap-defaults (assoc-in site-defaults [:security :anti-forgery] true))))
 
 ;; Define a singleton that acts as the container for a Jetty server (note that
 ;; the Jetty Server is stateful: it can be started/stopped).

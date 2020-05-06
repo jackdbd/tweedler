@@ -24,6 +24,7 @@
                             <input type="text" name="title" class="u-full-width">
                             <label for="content">Body</label>
                             <textarea name="content" class="u-full-width"></textarea>
+                            <input class="csrf-token" type="hidden" name="__anti-forgery-token">
                             <input type="submit" class="button-primary">
                         </fieldset>
                     </form>
@@ -33,6 +34,7 @@
                     <form class="seed-tweeds">
                         <p>Seed the store with a few tweeds.</p>
                         <fieldset>
+                            <input class="csrf-token" type="hidden" name="__anti-forgery-token">
                             <input type="submit" class="button-primary">
                         </fieldset>
                     </form>

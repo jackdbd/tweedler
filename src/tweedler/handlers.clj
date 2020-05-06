@@ -20,15 +20,16 @@
   [:.content] (html/html-content (md-to-html-string (:content tweed))))
 
 (html/deftemplate index-template "templates/index.html"
-  [tweeds]
+  [tweeds csrf-token]
   [:section.tweeds] (html/content (map tweed-template tweeds))
   [:form.new-tweed] (html/set-attr :method "post" :action "/")
+  [:input.csrf-token] (html/set-attr :value csrf-token)
   [:form.seed-tweeds] (html/set-attr :method "post" :action "/seed"))
 
 (defn home-handler
   "Return the home page."
-  [{store :store}]
-  (index-template (get-tweeds store)))
+  [req]
+  (index-template (get-tweeds (:store req)) (:anti-forgery-token req)))
 
 (defn create-tweed
   "Extract `title` and `content` from the Ring request, add a new tweed in the
