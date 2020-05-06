@@ -1,2 +1,3 @@
 language: clojure
-script: lein do clean, javac, test-all
+before_script: lein with-profile dev do clean, javac
+script: lein test-all
