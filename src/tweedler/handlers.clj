@@ -8,8 +8,6 @@
             [tweedler.tweed :refer [->Tweed]]
             [tweedler.utils :refer [escape-html]]))
 
-;; (defonce ^:private store (make-store "Atom Store for Tweeds"))
-
 (html/deftemplate not-found-template "templates/404.html"
   [href]
   [:a.home-link] (html/set-attr :href href))
