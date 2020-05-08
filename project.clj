@@ -14,7 +14,10 @@
   
   ; :global-vars {*warn-on-reflection* true}
 
-  :dependencies [;; Logging
+  :dependencies [;; HTML sanitizing
+                 [com.googlecode.owasp-java-html-sanitizer/owasp-java-html-sanitizer "20191001.1"]
+                 
+                 ;; Logging
                  [com.taoensso/timbre "4.10.0"]
                  
                  ;; Routing
