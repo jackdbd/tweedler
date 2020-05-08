@@ -12,6 +12,7 @@
     (GET "/login" [] "Logging in")
     (GET "/logout" [] "Logging out"))
   (route/resources "/css" {:root "/css"})
+  (route/resources "/js" {:root "/js"})
   (route/resources "/img" {:root "/img"})
   ;; The not-found route MUST be the last one
   (route/not-found (h/not-found-handler)))
