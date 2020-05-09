@@ -1,8 +1,10 @@
 # tweedler
 
-[![Build Status](https://travis-ci.org/jackdbd/tweedler.svg?branch=master)](https://travis-ci.org/jackdbd/tweedler)
+[![Build Status](https://travis-ci.com/jackdbd/tweedler.svg?branch=master)](https://travis-ci.org/jackdbd/tweedler)
 
 A simple app just to start practicing Clojure.
+
+![Dependency hierarchy graph](https://raw.githubusercontent.com/jackdbd/tweedler/master/images/ns-hierarchy.png "Dependency hierarchy graph generated with lein-hiera")
 
 ## Development
 
@@ -69,4 +71,12 @@ then run it with:
 
 ```sh
 java -jar target/uberjar/tweedler-standalone.jar
+```
+
+## Other
+
+The dependency hierarchy graph was generated with the Leiningen plugin [lein-hiera](https://github.com/greglook/lein-hiera). If you want to recreate it, run the following command (please note that you will need both lein-hiera and [Graphviz](https://graphviz.org/) installed).
+
+```sh
+lein hiera
 ```
