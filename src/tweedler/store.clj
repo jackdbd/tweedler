@@ -1,7 +1,6 @@
 (ns tweedler.store
   "This namespace defines the application store and its methods."
-  (:require [taoensso.timbre :as timbre :refer [debug]]
-            [tweedler.tweed :refer [->Tweed]]))
+  (:require [taoensso.timbre :as timbre :refer [debug]]))
 
 (defprotocol TweedStore
   "An abstraction of a store that holds the application's state."
@@ -35,9 +34,9 @@
   (seed-tweeds!
     [this]
     (debug "seed-tweeds!")
-    (put-tweed! this (->Tweed "First tweed" "test content 1"))
-    (put-tweed! this (->Tweed "Second tweed" "test content 2"))
-    (put-tweed! this (->Tweed "Third tweed" "test content 3"))))
+    (put-tweed! this {:title "First tweed" :content "test content 1"})
+    (put-tweed! this {:title "Second tweed" :content "test content 2"})
+    (put-tweed! this {:title "Third tweed" :content "test content 3"})))
 
 (defn make-store
   "Instantiate a store that holds some state in an atom."

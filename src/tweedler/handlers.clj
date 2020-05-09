@@ -5,7 +5,6 @@
             [ring.util.response :refer [redirect]]
             [taoensso.timbre :as timbre :refer [info]]
             [tweedler.store :refer [get-tweeds put-tweed! seed-tweeds!]]
-            [tweedler.tweed :refer [->Tweed]]
             [tweedler.utils :refer [escape-html]]))
 
 (html/deftemplate not-found-template "templates/404.html"
@@ -37,7 +36,7 @@
         title (get form-params "title")
         content (get-in req [:form-params "content"])]
     (info "create-tweed [title:" title "; content:" content "]")
-    (put-tweed! (:store req) (->Tweed (escape-html title) (escape-html content)))
+    (put-tweed! (:store req) {:title (escape-html title) :content (escape-html content)})
     (info "Redirect to /")
     (redirect "/" 302)))
 
