@@ -1,7 +1,7 @@
 (defproject tweedler "0.1.0-SNAPSHOT"
 
   ;; The description text is searchable from repositories like Clojars.
-  :description "A simple app just to start practicing Clojure."
+  :description "A simple app to start practicing Clojure."
   :url "https://github.com/jackdbd/tweedler"
 
   ;; Project's license, and whether it is OK for public repositories to host
@@ -27,13 +27,26 @@
                  [enlive "1.1.6"]
                  
                  ;; Access environment variables
-                 [environ "1.1.0"]
+                 [environ "1.2.0"]
+                 
+                 ;; Convert SQL queries into Clojure functions
+                 [com.layerware/hugsql "0.5.1"]
+                 
+                 ;; Database migrations (wrapper for Migratus)
+                 [luminus-migrations "0.6.7"]
                  
                  ;; Markdown parsing
                  [markdown-clj "1.10.4"]
                  
+                 ;; UUID generator
+                 [nano-id "1.0.0"]
+                 
                  ;; Version of Clojure used in this project
                  [org.clojure/clojure "1.10.1"]
+                 
+                 ;; SQLite JDBC driver. It's required, otherwise we get "No
+                 ;; suitable driver found for sqlite".
+                 [org.xerial/sqlite-jdbc "3.30.1"]
                  
                  ;; HTTP server abstraction
                  [ring "1.8.0"]
@@ -53,21 +66,31 @@
   :target-path "target/%s"
   :uberjar-name "tweedler-standalone.jar"
   
-  :aliases {"test-all" ["with-profile" "default:+1.8:+1.9:+1.10" "test"]
+  :aliases {"test-all" ["with-profile" "default:+1.9:+1.10" "test"]
             "tr" ["trampoline" "run" "-m" "tweedler.core/-main"]}
   
-  :profiles {:dev {:dependencies [[io.aviso/pretty "0.1.37"]
-                                  [pjstadig/humane-test-output "0.10.0"]
-                                  [ring/ring-mock "0.4.0"]]
-                   :injections [(require 'pjstadig.humane-test-output)
-                                (pjstadig.humane-test-output/activate!)]
-                   :middleware [io.aviso.lein-pretty/inject]
-                   :plugins [[com.jakemccrary/lein-test-refresh "0.24.1"]
-                             [io.aviso/pretty "0.1.37"]
-                             [lein-ring "0.12.5"]]}
-             
-             :uberjar {:aot :all :uberjar-name "tweedler-standalone.jar"}
-             
-             :1.8  {:dependencies [[org.clojure/clojure "1.8.0"]]}
+  :profiles {:uberjar {:aot :all :uberjar-name "tweedler-standalone.jar"}
              :1.9  {:dependencies [[org.clojure/clojure "1.9.0"]]}
-             :1.10  {:dependencies [[org.clojure/clojure "1.10.1"]]}})
+             :1.10  {:dependencies [[org.clojure/clojure "1.10.1"]]}
+             
+             ;; Define :dev and :test as Leiningen composite profiles
+             :dev [:project/dev :profiles/dev]
+             :test [:project/test :profiles/test]
+             
+             :project/dev {:dependencies [[io.aviso/pretty "0.1.37"]
+                                          [pjstadig/humane-test-output "0.10.0"]
+                                          [ring/ring-mock "0.4.0"]]
+                           :injections [(require 'pjstadig.humane-test-output)
+                                        (pjstadig.humane-test-output/activate!)]
+                           :middleware [io.aviso.lein-pretty/inject]
+                           :plugins [[com.jakemccrary/lein-test-refresh "0.24.1"]
+                                     [io.aviso/pretty "0.1.37"]
+                                     [lein-environ "1.2.0"]
+                                     [lein-ring "0.12.5"]]}
+             :project/test {}
+             
+             ;; Only edit :profiles/* in profiles.clj (not tracked under version
+             ;; control). For example:
+             ;; {:profiles/dev {:env {:database-url "jdbc:sqlite:MY-DB-NAME.db"}}}.
+             :profiles/dev {}
+             :profiles/test {}})

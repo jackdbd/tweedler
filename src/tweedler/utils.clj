@@ -27,3 +27,8 @@
   "Sanitize the user's input to mitigate XSS attacks."
   [^String s]
   (.sanitize policy-factory s))
+
+(defmacro docstring
+  "Return the doctring (if any) of a symbol."
+  [symbol]
+  `(:doc (meta #'~symbol)))
