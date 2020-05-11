@@ -1,6 +1,6 @@
 (ns tweedler.middleware
   "This namespace contains the middlewares specific for the Tweedler app."
-  (:require [tweedler.store :refer [make-store]]))
+  (:require [tweedler.store :refer [make-atom-store]]))
 
 (defn wrap-store
   "Add an instance of an atom-based store in the request map."
@@ -15,4 +15,4 @@
 
   (def my-ring-app (->
                     my-handler
-                    (wrap-store (make-store "name of my store")))))
+                    (wrap-store (make-atom-store "name of my store")))))

@@ -4,8 +4,9 @@
             [ring.mock.request :as mock]
             [ring.util.response :refer [redirect]]
             [tweedler.core :refer [handler]]
+            [tweedler.db :refer [db-migrate db-reset]]
             [tweedler.handlers :refer [create-tweed seed-tweeds]]
-            [tweedler.store :refer [get-tweeds make-store]]))
+            [tweedler.store :refer [get-tweeds make-atom-store]]))
 
 ;;  (defn- get-store
 ;;    "Access the store (private variable) from the handlers namespace.
@@ -13,9 +14,13 @@
 ;;    []
 ;;    @#'tweedler.handlers/store)
 
+;; TODO: reset the db and run all migrations in some kind of before-all test.
+(db-reset)
+(db-migrate)
+
 (deftest create-tweed-test
   (let [req {:form-params {"title" "Some title" "content" "Some content"}
-             :store (make-store "test-store")}
+             :store (make-atom-store "test-store")}
         tweeds-before (count (get-tweeds (:store req)))]
     (testing "creates a tweed and redirects to /"
       (is (= (redirect "/")
@@ -24,7 +29,7 @@
              (count (get-tweeds (:store req))))))))
 
 (deftest seed-tweeds-test
-  (let [req {:store (make-store "test-store")}
+  (let [req {:store (make-atom-store "test-store")}
         tweeds-before (count (get-tweeds (:store req)))]
     (testing "seed the store with 3 tweeds and redirects to /"
       (is (= (redirect "/")

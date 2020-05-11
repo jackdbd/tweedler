@@ -2,7 +2,8 @@
 -- :command :query
 -- :result :raw
 -- :doc Get all records from the `tweed` table
-SELECT * FROM tweed;
+SELECT * FROM tweed
+ORDER BY timestamp_creation DESC;
 
 -- :name put-tweed!
 -- :command :execute

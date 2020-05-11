@@ -1,18 +1,9 @@
 (ns tweedler.store
   "This namespace defines the application store and its methods."
   (:require
-   [environ.core :refer [env]]
-   [luminus-migrations.core :as migrations]
    [nano-id.core :refer [nano-id]]
    [taoensso.timbre :as timbre :refer [debug]]
    [tweedler.db-fns :as db-fns]))
-
-;; The functions created by HugSQL can accept a db-spec, a connection, a
-;; connection pool, or a transaction object. Let's keep it simple and use a
-;; db-spec for a SQLite database.
-(def database-spec {:classname "org.sqlite.JDBC"
-                    :subprotocol "sqlite"
-                    :subname (env :database-subname)})
 
 (defprotocol TweedStore
   "An abstraction of a store that holds the application's state."
@@ -23,7 +14,7 @@
 
 (defrecord AtomStore [^String name data])
 
-(defrecord SQLiteStore [db-spec])
+(defrecord SQLiteStore [datasource])
 
 (extend-protocol TweedStore
 
@@ -53,47 +44,30 @@
   (get-tweeds
     [this]
     (debug "get-tweeds")
-    (db-fns/get-tweeds (:db-spec this)))
+    (db-fns/get-tweeds (:datasource this)))
   (put-tweed!
     [this tweed]
     (let [{:keys [title content]} tweed]
       (debug "put-tweed!" title content)
-      (db-fns/put-tweed! (:db-spec this) {:id (nano-id) :title title :content content})))
+      (db-fns/put-tweed! (:datasource this) {:id (nano-id) :title title :content content})))
   (reset-tweeds!
     [this]
     (debug "reset-tweeds!")
-    (db-fns/delete-tweed! (:db-spec this)))
+    (db-fns/delete-tweed! (:datasource this)))
   (seed-tweeds!
     [this]
     (debug "seed-tweeds!")
     (def fake-tweeds [[(nano-id) "Fake title 0" "Fake content 0"]
                       [(nano-id) "Fake title 1" "Fake content 1"]])
-    (db-fns/seed-tweed! (:db-spec this) {:fakes fake-tweeds})))
+    (db-fns/seed-tweed! (:datasource this) {:fakes fake-tweeds})))
 
-(defn make-store
+(defn make-atom-store
   "Instantiate a store that holds some state in an atom."
   [name]
   ; https://guide.clojure.style/#record-constructors
   (->AtomStore name (atom {:tweeds '()})))
 
 (defn make-db-store
-  "Instantiate a store that get/retrieve state from a SQLite database."
-  [db-spec]
-  (->SQLiteStore db-spec))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Example
-(def db-store (make-db-store database-spec))
-
-;; before tests
-(migrations/migrate ["reset"] (select-keys env [:database-url]))
-(migrations/migrate ["migrate"] (select-keys env [:database-url]))
-
-(let [fakes [[(nano-id) "Fake title 123" "Fake content 123"]
-             [(nano-id) "Fake title 456" "Fake content 456"]]]
-  (db-fns/seed-tweed! (:db-spec db-store) {:fakes fakes}))
-(db-fns/get-tweeds (:db-spec db-store))
-
-;; after tests
-(migrations/migrate ["reset"] (select-keys env [:database-url]))
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+  "Instantiate a store that holds the app's state in a SQLite database."
+  [datasource]
+  (->SQLiteStore datasource))

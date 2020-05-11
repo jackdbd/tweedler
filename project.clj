@@ -32,11 +32,15 @@
                  ;; Convert SQL queries into Clojure functions
                  [com.layerware/hugsql "0.5.1"]
                  
+                 [hikari-cp "2.12.0"]
+                 
                  ;; Database migrations (wrapper for Migratus)
                  [luminus-migrations "0.6.7"]
                  
                  ;; Markdown parsing
                  [markdown-clj "1.10.4"]
+                 
+                 [migratus "1.2.8"]
                  
                  ;; UUID generator
                  [nano-id "1.0.0"]
