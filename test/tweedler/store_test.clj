@@ -20,14 +20,14 @@
 (deftest db-store-seed-tweeds-test
   (let [delay-ds (delay (make-datasource {:jdbc-url (env :database-url)}))]
     (jdbc/with-db-connection
-     [conn {:datasource @delay-ds}]
-     (let [config {:store :database
-                   :db {:datasource (:datasource conn)}}]
-       (testing "Adds 2 tweeds to the store"
-         (migratus/reset config)
-         (migratus/migrate config)         
-         (let [db-store (make-db-store conn)]
-           (is (= 0 (count (get-tweeds db-store))))
-           (seed-tweeds! db-store)
-           (is (= 2 (count (get-tweeds db-store))))))))
+      [conn {:datasource @delay-ds}]
+      (let [config {:store :database
+                    :db {:datasource (:datasource conn)}}]
+        (testing "Adds 2 tweeds to the store"
+          (migratus/reset config)
+          (migratus/migrate config)
+          (let [db-store (make-db-store conn)]
+            (is (= 0 (count (get-tweeds db-store))))
+            (seed-tweeds! db-store)
+            (is (= 2 (count (get-tweeds db-store))))))))
     (close-datasource @delay-ds)))

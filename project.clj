@@ -89,6 +89,8 @@
                            :middleware [io.aviso.lein-pretty/inject]
                            :plugins [[com.jakemccrary/lein-test-refresh "0.24.1"]
                                      [io.aviso/pretty "0.1.37"]
+                                     [jonase/eastwood "0.3.10"]
+                                     [lein-cljfmt "0.6.7" :exclusions [org.clojure/clojure]]
                                      [lein-environ "1.2.0"]
                                      [lein-ring "0.12.5"]]}
              :project/test {}

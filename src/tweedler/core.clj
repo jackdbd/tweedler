@@ -66,5 +66,5 @@
    GOTCHA: avoid hardcoding a port number when deploying on Heroku.
    https://stackoverflow.com/a/15693371/3036129"
   [& [port]]
-  (let [port (Integer. (or port (env :port) 5000))]
+  (let [port (Integer/valueOf (or port (env :port) 5000))]
     (start-server port)))
