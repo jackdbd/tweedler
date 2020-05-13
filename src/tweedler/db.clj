@@ -52,9 +52,19 @@
   (db-fns/get-tweeds db-spec))
 
 (defn db-seed
-  "Seed the database with some fakes (useful in the REPL).
-  The fakes are generated with [java-faker](https://github.com/DiUS/java-faker)."
+  "Seed the database with some fakes (useful in the REPL)."
   []
   (let [fake-tweeds [[(nano-id) "First fake title" "First fake content"]
                      [(nano-id) "Second fake title" "Second fake content"]]]
     (db-fns/seed-tweed! db-spec {:fakes fake-tweeds})))
+
+(defn -main
+  "Seed the database with some fakes.
+   Run this function as a Leiningen task:
+   lein run 'tweedler.db/-main' (or use the alias lein seed-db)"
+  []
+  (prn "=== Seed the database with some fakes ===")
+  (db-seed)
+  (let [ids (for [tweed (db-fns/get-tweeds db-spec)]
+              (:id tweed))]
+    (prn "IDs of fakes:" ids)))

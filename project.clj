@@ -70,7 +70,12 @@
   :target-path "target/%s"
   :uberjar-name "tweedler-standalone.jar"
   
-  :aliases {"test-all" ["with-profile" "default:+1.9:+1.10" "test"]
+  :migratus {:store :database
+             :migration-dir "migrations"
+             :db ~(get (System/getenv) "DATABASE_URL")}
+  
+  :aliases {"seed-db" ["with-profile" "dev" "run" "-m" "tweedler.db/-main"]
+            "test-all" ["with-profile" "default:+1.9:+1.10" "test"]
             "tr" ["trampoline" "run" "-m" "tweedler.core/-main"]}
   
   :profiles {:uberjar {:aot :all :uberjar-name "tweedler-standalone.jar"}
@@ -92,7 +97,8 @@
                                      [jonase/eastwood "0.3.10"]
                                      [lein-cljfmt "0.6.7" :exclusions [org.clojure/clojure]]
                                      [lein-environ "1.2.0"]
-                                     [lein-ring "0.12.5"]]}
+                                     [lein-ring "0.12.5"]
+                                     [migratus-lein "0.7.3"]]}
              :project/test {}
              
              ;; Only edit :profiles/* in profiles.clj (not tracked under version
