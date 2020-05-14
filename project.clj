@@ -17,6 +17,9 @@
   :dependencies [;; HTML sanitizing
                  [com.googlecode.owasp-java-html-sanitizer/owasp-java-html-sanitizer "20191001.1"]
                  
+                 ;; Redis client
+                 [com.taoensso/carmine "2.19.1"]
+                 
                  ;; Logging
                  [com.taoensso/timbre "4.10.0"]
                  
@@ -32,6 +35,7 @@
                  ;; Convert SQL queries into Clojure functions
                  [com.layerware/hugsql "0.5.1"]
                  
+                 ;; Database connection pool
                  [hikari-cp "2.12.0"]
                  
                  ;; Database migrations (wrapper for Migratus)
@@ -40,6 +44,7 @@
                  ;; Markdown parsing
                  [markdown-clj "1.10.4"]
                  
+                 ;; Database migrations
                  [migratus "1.2.8"]
                  
                  ;; UUID generator

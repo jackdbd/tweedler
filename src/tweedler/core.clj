@@ -9,7 +9,7 @@
    [taoensso.timbre :as timbre :refer [info]]
    [tweedler.middleware :refer [wrap-store]]
    [tweedler.routes :refer [app-routes]]
-   [tweedler.store :refer [make-atom-store make-db-store]]))
+   [tweedler.store :refer [make-db-store make-redis-store-hashes make-redis-store-list]]))
 
 (def ^:dynamic *datasource*
   (make-datasource {:jdbc-url (env :database-url)}))
@@ -17,14 +17,18 @@
 (def handler
   "The Ring main handler (i.e. the Ring application)."
   (-> app-routes
-      (wrap-store (make-db-store {:datasource *datasource*}))
+      ;; (wrap-store (make-redis-store-hashes "tweed:"))
+      (wrap-store (make-redis-store-list "tweeds"))
+      ;; (wrap-store (make-db-store {:datasource *datasource*}))
       ;; (wrap-store (make-atom-store "app-store"))
       (wrap-defaults (assoc-in site-defaults [:security :anti-forgery] true))))
 
 (defn make-handler
   [ds]
   (-> app-routes
-      (wrap-store (make-db-store {:datasource ds}))
+      ;; (wrap-store (make-redis-store-hashes "tweed:"))
+      (wrap-store (make-redis-store-list "tweeds"))
+      ;; (wrap-store (make-db-store {:datasource ds}))
       (wrap-defaults (assoc-in site-defaults [:security :anti-forgery] true))))
 
 ;; Define a singleton that acts as the container for a Jetty server (note that
