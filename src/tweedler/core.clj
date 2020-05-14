@@ -19,8 +19,8 @@
   [datasource]
   (-> app-routes
       ;; (wrap-store (make-redis-store-hashes "tweed:"))
-      ;; (wrap-store (make-redis-store-list "tweeds"))
-      (wrap-store (make-db-store datasource))
+      (wrap-store (make-redis-store-list "tweeds"))
+      ;; (wrap-store (make-db-store datasource))
       (wrap-defaults (assoc-in site-defaults [:security :anti-forgery] true))))
 
 (def app
