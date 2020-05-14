@@ -7,14 +7,20 @@
    [taoensso.timbre :as timbre :refer [debug]]
    [tweedler.db-fns :as db-fns]))
 
-;; (def server1-conn {:pool {} :spec {:db 1
-;;                                    :host (env :redis-host)
-;;                                    :port (Integer/valueOf (env :redis-port))}})
+(defn- redis-spec
+  "Get the Redis :spec for the current environment.
+   On Heroku the `REDISTOGO_URL` environment variable is set."
+  []
+  (if (env :redistogo-url)
+    {:uri (env :redistogo-url)}
+    {:db 1 :host (env :redis-host) :port (Integer/valueOf (env :redis-port))}))
 
-(prn "REDIS TO GO" (env :redistogo-url) "===" (System/getenv "REDISTOGO_URL"))
-(def server1-conn {:pool {} :spec {:uri (env :redistogo-url)}})
+(def server1-conn {:pool {} :spec (redis-spec)})
 
-(defmacro wcar* [& body] `(car/wcar server1-conn ~@body))
+(defmacro wcar*
+  "Connection pool for Redis."
+  [& body]
+  `(car/wcar server1-conn ~@body))
 
 (defprotocol TweedStore
   "An abstraction of a store that holds the application's state."
