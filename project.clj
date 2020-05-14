@@ -9,64 +9,67 @@
   :license {:name "MIT License"
             :url "https://choosealicense.com/licenses/mit/"}
 
-  ;; Warn me of earlier versions of Leiningen and tell TravisCI to use this one.
+  ;; Tell TravisCI and Heroku to use at least this Leiningen version.
   :min-lein-version "2.0.0"
   
-  ; :global-vars {*warn-on-reflection* true}
+  ;; Java reflection can be bad for performance.
+  ;; https://clojure.org/reference/java_interop
+  ;; :global-vars {*warn-on-reflection* true}
 
   :dependencies [;; HTML sanitizing
                  [com.googlecode.owasp-java-html-sanitizer/owasp-java-html-sanitizer "20191001.1"]
-                 
+
                  ;; Redis client
                  [com.taoensso/carmine "2.19.1"]
-                 
+
                  ;; Logging
                  [com.taoensso/timbre "4.10.0"]
-                 
+
                  ;; Routing
                  [compojure "1.6.1"]
-                 
+
                  ;; Server-side templating
                  [enlive "1.1.6"]
-                 
+
                  ;; Access environment variables
                  [environ "1.2.0"]
-                 
+
                  ;; Convert SQL queries into Clojure functions
-                 [com.layerware/hugsql "0.5.1"]
-                 
+                 [com.layerware/hugsql "0.5.1" :exclusions [org.clojure/java.jdbc org.clojure/tools.reader]]
+                 [com.layerware/hugsql-adapter-next-jdbc "0.5.1"]
+
                  ;; Database connection pool
-                 [hikari-cp "2.12.0"]
-                 
-                 ;; Database migrations (wrapper for Migratus)
-                 [luminus-migrations "0.6.7"]
-                 
+                 [com.zaxxer/HikariCP "3.4.5"]
+
                  ;; Markdown parsing
                  [markdown-clj "1.10.4"]
-                 
+
                  ;; Database migrations
                  [migratus "1.2.8"]
-                 
+
                  ;; UUID generator
                  [nano-id "1.0.0"]
-                 
+
                  ;; Version of Clojure used in this project
                  [org.clojure/clojure "1.10.1"]
-                 
+
                  ;; SQLite JDBC driver. It's required, otherwise we get "No
                  ;; suitable driver found for sqlite".
                  [org.xerial/sqlite-jdbc "3.30.1"]
-                 
+
                  ;; HTTP server abstraction
                  [ring "1.8.0"]
                  ;; add some Ring middlewares
-                 [ring/ring-defaults "0.3.2"]]
+                 [ring/ring-defaults "0.3.2"]
+                 
+                 ;; Next-gen JDBC
+                 [seancorfield/next.jdbc "1.0.424" :exclusions [org.clojure/tools.logging]]]
 
   ;; What to do in the case of dependencies' version conflicts.
-  ; :pedantic? :warn
+  ;; :pedantic? :warn
   
   ;; Configuration for lein-ring plugin.
-  :ring {:handler tweedler.core/handler}
+  :ring {:handler tweedler.core/app}
 
   ;; Non-code files included in classpath/jar.
   :resource-paths ["resources"]
@@ -93,7 +96,7 @@
              
              :project/dev {:dependencies [[io.aviso/pretty "0.1.37"]
                                           [pjstadig/humane-test-output "0.10.0"]
-                                          [ring/ring-mock "0.4.0"]]
+                                          [ring/ring-mock "0.4.0" :exclusions [ring/ring-codec]]]
                            :injections [(require 'pjstadig.humane-test-output)
                                         (pjstadig.humane-test-output/activate!)]
                            :middleware [io.aviso.lein-pretty/inject]

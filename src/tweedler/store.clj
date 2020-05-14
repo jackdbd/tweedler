@@ -13,7 +13,7 @@
   []
   (if (env :redistogo-url)
     {:uri (env :redistogo-url)}
-    {:db 1 :host (env :redis-host) :port (Integer/valueOf (env :redis-port))}))
+    {:db 1 :host (env :redis-host) :port (Integer/valueOf ^String (env :redis-port))}))
 
 (def server1-conn {:pool {} :spec (redis-spec)})
 
