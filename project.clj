@@ -109,8 +109,8 @@
                                      [migratus-lein "0.7.3"]]}
              :project/test {}
              
-             ;; Only edit :profiles/* in profiles.clj (not tracked under version
-             ;; control). For example:
-             ;; {:profiles/dev {:env {:database-url "jdbc:sqlite:MY-DB-NAME.db"}}}.
-             :profiles/dev {}
+             ;; profiles could also be stored in profiles.clj
+             :profiles/dev {:env {:database-url "jdbc:sqlite:tweedler_dev.db"
+                                  :redis-host "127.0.0.1"
+                                  :redis-port "6379"}}
              :profiles/test {}})
