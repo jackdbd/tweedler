@@ -56,6 +56,9 @@
                  ;; SQLite JDBC driver. It's required, otherwise we get "No
                  ;; suitable driver found for sqlite".
                  [org.xerial/sqlite-jdbc "3.30.1"]
+                 
+                 ;; Better exception reporting for Ring applications
+                 [prone "2020-01-17"]
 
                  ;; HTTP server abstraction
                  [ring "1.8.0"]
@@ -111,6 +114,8 @@
              
              ;; profiles could also be stored in profiles.clj
              :profiles/dev {:env {:database-url "jdbc:sqlite:tweedler_dev.db"
+                                  :not-found-page-redirect-uri "http://localhost:3000/"
                                   :redis-host "127.0.0.1"
-                                  :redis-port "6379"}}
+                                  :redis-port "6379"}
+                            :ring {:stacktrace-middleware prone.middleware/wrap-exceptions}}
              :profiles/test {}})
