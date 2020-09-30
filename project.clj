@@ -107,15 +107,8 @@
                                      [io.aviso/pretty "0.1.37"]
                                      [jonase/eastwood "0.3.10"]
                                      [lein-cljfmt "0.6.7" :exclusions [org.clojure/clojure]]
-                                     [lein-environ "1.2.0"]
                                      [lein-ring "0.12.5"]
                                      [migratus-lein "0.7.3"]]}
              :project/test {}
-             
-             ;; profiles could also be stored in profiles.clj
-             :profiles/dev {:env {:database-url "jdbc:sqlite:tweedler_dev.db"
-                                  :not-found-page-redirect-uri "http://localhost:3000/"
-                                  :redis-host "127.0.0.1"
-                                  :redis-port "6379"}
-                            :ring {:stacktrace-middleware prone.middleware/wrap-exceptions}}
+             :profiles/dev {:ring {:stacktrace-middleware prone.middleware/wrap-exceptions}}
              :profiles/test {}})
