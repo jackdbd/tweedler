@@ -1,1 +1,1 @@
-caprover deploy --caproverName captain-01 --caproverApp tweedler --branch master
+caprover deploy --caproverName captain-01 --caproverApp tweedler --branch redis-store
