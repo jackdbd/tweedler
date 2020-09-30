@@ -24,5 +24,5 @@ COPY src ${APP_DIR}/src
 RUN lein ring uberjar
 # RUN tree -L 3
 
-CMD java -jar ${JVM_OPTS} ${APP_DIR}/target/uberjar/tweedler-standalone.jar
-# CMD lein ring server-headless
+# CMD java -jar ${JVM_OPTS} ${APP_DIR}/target/uberjar/tweedler-standalone.jar
+CMD lein ring server-headless
