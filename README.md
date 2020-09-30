@@ -41,7 +41,7 @@ Otherwise, run it in the REPL, so you can start and stop the server:
 lein repl
 
 # In the REPL
-tweedler.core=> (run-server 3000)
+tweedler.core=> (start-server 3000)
 tweedler.core=> (stop-server)
 ```
 
@@ -53,24 +53,42 @@ Run all tests in "watch mode" with [lein-test-refresh](https://github.com/jakemc
 lein test-refresh
 ```
 
-To check test coverage, I use [cloverage](https://github.com/cloverage/cloverage):
-
-```sh
-lein cloverage
-```
-
 ## Build
 
 Create a standalone, compiled ahead-of-time `.jar` file with:
 
 ```sh
 lein uberjar
+# or
+lein ring uberjar
 ```
 
 then run it with:
 
 ```sh
 java -jar target/uberjar/tweedler-standalone.jar
+# or
+lein ring server-headless
+```
+
+## Dockerized app
+
+Build the Docker image and give it a name and a version tag:
+
+```shell
+docker build -t tweedler:v0.1.0 .
+```
+
+Run the Docker container:
+
+```shell
+docker run -p 3001:3000 tweedler:v0.1.0
+```
+
+Deploy the dockerized app on CapRover (running on my DigitalOcean Droplet):
+
+```shell
+./deploy.sh
 ```
 
 ## Other

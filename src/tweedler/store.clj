@@ -7,15 +7,17 @@
    [taoensso.timbre :as timbre :refer [debug]]
    [tweedler.db-fns :as db-fns]))
 
-(defn- redis-spec
-  "Get the Redis :spec for the current environment.
-   On Heroku the `REDISTOGO_URL` environment variable is set."
-  []
-  (if (env :redistogo-url)
-    {:uri (env :redistogo-url)}
-    {:db 1 :host (env :redis-host) :port (Integer/valueOf ^String (env :redis-port))}))
+; (defn- redis-spec
+;   "Get the Redis :spec for the current environment.
+;    On Heroku the `REDISTOGO_URL` environment variable is set."
+;   []
+;   (if (env :redistogo-url)
+;     {:uri (env :redistogo-url)}
+;     {:db 1 :host (env :redis-host) :port (Integer/valueOf ^String (env :redis-port))}))
 
-(def server1-conn {:pool {} :spec (redis-spec)})
+; TODO: fix redis-spec
+; (def server1-conn {:pool {} :spec (redis-spec)})
+(def server1-conn {:pool {} :spec {}})
 
 (defmacro wcar*
   "Connection pool for Redis."
@@ -41,6 +43,12 @@
   [cursor pattern]
   (wcar* (car/scan cursor "MATCH" pattern)))
 
+; TODO: I think the problem is in redis-spec. What to do if environment
+; variables are not set?
+; (defn- redis-scan
+;   [cursor pattern]
+;   (prn "=== cursor, pattern ===" cursor pattern))
+
 (defn- new-tweed-key
   [prefix]
   (format "%s%s" prefix (nano-id)))
@@ -58,6 +66,10 @@
   [k]
   (let [[title content timestamp] (wcar* (car/hvals k))]
     {:id k :title title :content content :timestamp timestamp}))
+
+; (defn tweed-from-key
+;   [k]
+;   {:id k :title "TODO title" :content "TODO content" :timestamp "TODO timestamp"})
 
 (extend-protocol TweedStore
 

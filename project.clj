@@ -9,7 +9,7 @@
   :license {:name "MIT License"
             :url "https://choosealicense.com/licenses/mit/"}
 
-  ;; Tell TravisCI and Heroku to use at least this Leiningen version.
+  ;; Tell TravisCI to use at least this Leiningen version.
   :min-lein-version "2.0.0"
   
   ;; Java reflection can be bad for performance.

@@ -9,24 +9,30 @@
    [taoensso.timbre :as timbre :refer [info]]
    [tweedler.middleware :refer [wrap-store]]
    [tweedler.routes :refer [app-routes]]
-   [tweedler.store :refer [make-db-store make-redis-store-list]])
+   [tweedler.store :refer [make-atom-store make-db-store make-redis-store-list]])
   (:import [com.zaxxer.hikari HikariDataSource]
            [org.eclipse.jetty.server Server]))
 
-(def db-spec {:jdbcUrl (env :database-url)})
+; (def db-spec {:jdbcUrl (env :database-url)})
+; (def db-spec {:jdbcUrl "jdbc:sqlite::memory:"})
+(def db-spec {:jdbcUrl "jdbc:sqlite:tweedler_dev.db"})
 
 (defn make-handler
   [datasource]
   (-> app-routes
       ;; (wrap-store (make-redis-store-hashes "tweed:"))
-      (wrap-store (make-redis-store-list "tweeds"))
+      ; (wrap-store (make-redis-store-list "tweeds"))
       ;; (wrap-store (make-db-store datasource))
+      (wrap-store (make-atom-store "tweedler-atom-store"))
       (wrap-defaults (assoc-in site-defaults [:security :anti-forgery] true))))
 
+;; (def app
+;;   "The Ring main handler (i.e. the Ring application)."
+;;   (let [ds (connection/->pool HikariDataSource db-spec)]
+;;     (make-handler ds)))
 (def app
   "The Ring main handler (i.e. the Ring application)."
-  (let [ds (connection/->pool HikariDataSource db-spec)]
-    (make-handler ds)))
+  (make-handler "does-not-matter"))
 
 ;; Define a singleton that acts as the container for a Jetty server (note that
 ;; the Jetty Server is stateful: it can be started/stopped).
@@ -72,3 +78,7 @@
   [& [port]]
   (let [port (or port (Integer/valueOf ^String (env :port)) 5000)]
     (start-server port)))
+
+(comment
+  (start-server 3000)
+  (stop-server))

@@ -1,0 +1,10 @@
+.calva/
+.git/
+images/
+target/
+test/
+
+.lein-env
+.lein-repl-history
+.travis.yml
+*.db
