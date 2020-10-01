@@ -1,7 +1,7 @@
 # === STAGE 1 ================================================================ #
 # Build a standalone .jar file with Leiningen
 # ============================================================================ #
-FROM clojure:latest AS CLOJURE_BUILD
+FROM clojure:latest AS builder
 
 LABEL maintainer="jackdebidda@gmail.com"
 
@@ -12,6 +12,7 @@ ENV APP_DIR=/usr/src/app \
 # RUN apt-get -y install tree
 
 RUN mkdir -p ${APP_DIR}
+
 # The WORKDIR instruction sets the working directory for any RUN, CMD,
 # ENTRYPOINT, COPY and ADD instructions that follow it in the Dockerfile.
 WORKDIR ${APP_DIR}
@@ -31,20 +32,29 @@ RUN lein ring uberjar
 # Copy the .jar built at stage 1 and execute it
 # ============================================================================ #
 
+# I think we can safely run the generated .jar on a JVM which runs on a
+# different Linux distro. For this second stage we use Alpine Linux instead of
+# clojure:latest (which is based on Debian). This way we save a few MB on
+# the Docker image.
 FROM openjdk:8-jre-alpine3.9
 
-ENV APP_DIR=/usr/src/app \
+ENV SRC_DIR=/usr/src/app \
+    USER_HOME=/home/appuser \
     JAR_FILE=tweedler-standalone.jar \
     PORT=3000 \
     JVM_OPTS=-Dclojure.main.report=stderr
 
 # RUN apk add tree
 
-RUN mkdir -p ${APP_DIR}
-WORKDIR ${APP_DIR}
+# Create a group and user
+RUN addgroup -S appgroup && adduser -S appuser -G appgroup
 
+USER appuser
+
+WORKDIR ${USER_HOME}
+
+COPY --from=builder ${SRC_DIR}/target/uberjar/${JAR_FILE} ${USER_HOME}/${JAR_FILE}
 # RUN tree -L 3
-COPY --from=CLOJURE_BUILD ${APP_DIR}/target/uberjar/${JAR_FILE} ${APP_DIR}/${JAR_FILE}
 
 EXPOSE ${PORT}
 
@@ -56,4 +66,4 @@ EXPOSE ${PORT}
 # HEALTHCHECK --interval=5m --timeout=3s \
 #   CMD curl --fail https://localhost/ || exit 1
  
-CMD java -jar ${JVM_OPTS} ${APP_DIR}/${JAR_FILE}
+CMD java -jar ${JVM_OPTS} ${USER_HOME}/${JAR_FILE}
