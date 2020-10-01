@@ -51,7 +51,7 @@ EXPOSE ${PORT}
 # Check every 2 minutes that a web-server is able to serve the site's main page
 # within 5 seconds.
 # https://docs.docker.com/engine/reference/builder/#healthcheck
-HEALTHCHECK --interval=2m --timeout=5s \
-  CMD curl --fail https://localhost/ || exit 1
+# HEALTHCHECK --interval=2m --timeout=5s \
+#   CMD curl --fail https://localhost/ || exit 1
  
 CMD java -jar ${JVM_OPTS} ${APP_DIR}/${JAR_FILE}
