@@ -58,12 +58,11 @@ COPY --from=builder ${SRC_DIR}/target/uberjar/${JAR_FILE} ${USER_HOME}/${JAR_FIL
 
 EXPOSE ${PORT}
 
-# Check every 5 minutes that a web-server is able to serve the site's main page
-# within 3 seconds.
+# Check every x minutes that a web-server is able to serve the site's main page
+# within y seconds.
 # https://docs.docker.com/engine/reference/builder/#healthcheck
-# I think I can't use a Docker HEALTHCHECK on CapRover. It seems it causes the
-# container to hang in a status of: `(health: starting)`
-# HEALTHCHECK --interval=5m --timeout=3s \
-#   CMD curl --fail https://localhost/ || exit 1
+# Note: curl is not available in Alpine images! Use wget instead.
+HEALTHCHECK --interval=1m --timeout=3s --retries=3 \
+  CMD wget --no-verbose --tries=1 --spider http://localhost:${PORT}/ || exit 1
  
 CMD java -jar ${JVM_OPTS} ${USER_HOME}/${JAR_FILE}
