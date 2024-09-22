@@ -1,15 +1,9 @@
-.clj-kondo/
 .calva/
-checkouts
+.clj-kondo/
+.nrepl-port
+
 docs/
 target/
 
-.eastwood
-.lein-*
-.nrepl-port
 pom.xml
-
 *.db
-
-# Environment variables
-.envrc
