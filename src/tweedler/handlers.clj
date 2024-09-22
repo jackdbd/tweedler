@@ -1,13 +1,11 @@
 (ns tweedler.handlers
   "This namespace contains the handlers invoked when visiting the app routes."
-  (:require
-   [environ.core :refer [env]]
-   [markdown.core :refer [md-to-html-string]]
-   [net.cgrand.enlive-html :as html]
-   [ring.util.response :refer [redirect]]
-   [taoensso.timbre :as timbre :refer [info]]
-   [tweedler.store :refer [get-tweeds put-tweed! seed-tweeds!]]
-   [tweedler.utils :refer [escape-html]]))
+  (:require [markdown.core :refer [md-to-html-string]]
+            [net.cgrand.enlive-html :as html]
+            [ring.util.response :refer [redirect]]
+            [taoensso.timbre :as timbre :refer [info]]
+            [tweedler.store :refer [get-tweeds put-tweed! seed-tweeds!]]
+            [tweedler.utils :refer [escape-html]]))
 
 (html/deftemplate not-found-template "templates/404.html"
   [href]
@@ -53,4 +51,5 @@
 (defn not-found-handler
   "Return a 404 page."
   []
-  (not-found-template (env :not-found-page-redirect-uri)))
+  (not-found-template (System/getenv "NOT_FOUND_PAGE_REDIRECT_URI")))
+

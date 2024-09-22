@@ -1,11 +1,9 @@
 (ns tweedler.store
   "This namespace defines the application store and its methods."
-  (:require
-   [environ.core :refer [env]]
-   [nano-id.core :refer [nano-id]]
-   [taoensso.carmine :as car]
-   [taoensso.timbre :as timbre :refer [debug]]
-   [tweedler.db-fns :as db-fns]))
+  (:require [nano-id.core :refer [nano-id]]
+            [taoensso.carmine :as car]
+            [taoensso.timbre :as timbre :refer [debug]]
+            [tweedler.db-fns :as db-fns]))
 
 ; (defn- redis-spec
 ;   "Get the Redis :spec for the current environment.

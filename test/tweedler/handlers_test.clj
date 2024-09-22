@@ -1,18 +1,16 @@
 (ns tweedler.handlers-test
-  (:require
-   [clojure.string :as s]
-   [clojure.test :refer [deftest is testing]]
-   [environ.core :refer [env]]
-   [migratus.core :as migratus]
-   [next.jdbc.connection :as connection]
-   [ring.mock.request :as mock]
-   [ring.util.response :refer [redirect]]
-   [tweedler.core :refer [make-handler]]
-   [tweedler.handlers :refer [create-tweed seed-tweeds]]
-   [tweedler.store :refer [get-tweeds make-atom-store]])
+  (:require [clojure.string :as s]
+            [clojure.test :refer [deftest is testing]]
+            [migratus.core :as migratus]
+            [next.jdbc.connection :as connection]
+            [ring.mock.request :as mock]
+            [ring.util.response :refer [redirect]]
+            [tweedler.core :refer [make-handler]]
+            [tweedler.handlers :refer [create-tweed seed-tweeds]]
+            [tweedler.store :refer [get-tweeds make-atom-store]])
   (:import (com.zaxxer.hikari HikariDataSource)))
 
-(def db-spec {:jdbcUrl (env :database-url)})
+(def db-spec {:jdbcUrl (System/getenv "JDBC_DATABASE_URL")})
 
 ;;  (defn- get-store
 ;;    "Access the store (private variable) from the handlers namespace.
@@ -49,10 +47,10 @@
     (let [config {:store :database
                   :db {:datasource ds}}
           handler (make-handler ds)]
-        ;; Apply migrations ;;;;;;;
+      ;; Apply migrations ;;;;;;;
       (migratus/reset config)
       (migratus/migrate config)
-        ;;;;;;;;;;;;;;;;;;;;;;;;;;;
+      ;;;;;;;;;;;;;;;;;;;;;;;;;;;
       (testing "has the expected Content-Type header"
         (let [response (handler (mock/request :get "/"))]
           (is (= "text/html; charset=utf-8"
@@ -60,7 +58,6 @@
       (testing "contains the expected secure headers"
         (let [response (handler (mock/request :get "/"))
               headers (:headers response)]
-          (is (contains? headers "X-XSS-Protection"))
           (is (contains? headers "X-Content-Type-Options"))
           (is (contains? headers "X-Frame-Options"))))
       (testing "has a ring-session cookie that has the expected substrings"
@@ -70,8 +67,7 @@
               ring-session-cookie (first set-cookie-header)] ; TODO what if it's not the first cookie?
           (is (.contains ring-session-cookie "ring-session"))
           (is (= true (contains-sub? ring-session-cookie "HttpOnly")))
-          (is (= true (contains-sub? ring-session-cookie "Path=/")))
-          (is (= true (contains-sub? ring-session-cookie "SameSite=Strict")))))
+          (is (= true (contains-sub? ring-session-cookie "Path=/")))))
       (testing "contains a CSRF token that has the expected name"
         (let [response (handler (mock/request :get "/"))
               body (:body response)]

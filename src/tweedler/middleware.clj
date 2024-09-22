@@ -10,7 +10,7 @@
 
 (comment
   (defn my-handler
-    [req]
+    [_req]
     {:body "<h1>hello</h1>" :status 200 :headers {"Content-Type" "text/html"}})
 
   (def my-ring-app (->

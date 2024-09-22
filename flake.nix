@@ -23,22 +23,30 @@
           };
         });
   in {
+    overlays.default = final: prev: {};
     devShells = forEachSupportedSystem ({pkgs}: {
       default = pkgs.mkShell {
         packages = with pkgs; [
           babashka # Clojure interpreter for scripting
+          graphviz
           neo-cowsay # just for fun
+          sqlite
           temurin-bin # Eclipse Temurin, prebuilt OpenJDK binary
         ];
         shellHook = ''
           cowthink "Welcome to this nix dev shell!" --bold -f tux --rainbow
           echo "Versions"
           bb --version
+          dot --version # one of the tools installed with graphviz
+          java --version
 
-          # export FOO=bar;
+          export NOT_FOUND_PAGE_REDIRECT_URI="http://localhost:$PORT/";
         '';
-        # see gcp:zone in Pulumi.dev.yaml
-        FOO = "bar";
+        JDBC_DATABASE_URL = "jdbc:sqlite:tweedler_dev.db";
+        JVM_OPTS = "-Dclojure.main.report=stderr";
+        PORT = 3000;
+        REDIS_HOST = "127.0.0.1";
+        REDIS_PORT = 6379;
       };
     });
   };

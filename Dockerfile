@@ -1,15 +1,12 @@
 # === STAGE 1 ================================================================ #
-# Build a standalone .jar file with Leiningen
+# Build a standalone .jar file
 # ============================================================================ #
-FROM clojure:latest AS builder
+FROM clojure:tools-deps-bullseye-slim as builder
 
-LABEL maintainer="jackdebidda@gmail.com"
+LABEL maintainer="giacomo@giacomodebidda.com"
 
 ENV APP_DIR=/usr/src/app \
-    JAR_FILE=tweedler-standalone.jar
-
-# RUN apt-get -y update
-# RUN apt-get -y install tree
+    JAR_FILE=tweedler-1.2.0-standalone.jar
 
 RUN mkdir -p ${APP_DIR}
 
@@ -17,43 +14,45 @@ RUN mkdir -p ${APP_DIR}
 # ENTRYPOINT, COPY and ADD instructions that follow it in the Dockerfile.
 WORKDIR ${APP_DIR}
 
-COPY project.clj ${APP_DIR}/
+# Put files/directories that change less frequently first
+COPY build.clj ${APP_DIR}/
+COPY migratus.clj ${APP_DIR}/
+COPY deps.edn ${APP_DIR}/
 COPY resources ${APP_DIR}/resources
 COPY src ${APP_DIR}/src
 
-# The Clojure project.clj includes the lein-ring plugin, so we can use this
-# command to build the .jar
-# https://github.com/weavejester/lein-ring
-RUN lein ring uberjar
-# or simply use lein uberjar as usual
-# RUN lein uberjar
+RUN clj -T:build uber
 
 # === STAGE 2 ================================================================ #
 # Copy the .jar built at stage 1 and execute it
 # ============================================================================ #
 
-# I think we can safely run the generated .jar on a JVM which runs on a
-# different Linux distro. For this second stage we use Alpine Linux instead of
-# clojure:latest (which is based on Debian). This way we save a few MB on
-# the Docker image.
-FROM openjdk:8-jre-alpine3.9
+FROM eclipse-temurin:23_37-jre-ubi9-minimal
+# Red Hat Universal Base Image 9 Minimal uses microdnf as a package manager.
+# https://catalog.redhat.com/software/containers/ubi9/ubi-minimal/615bd9b4075b022acc111bf5
 
-ENV SRC_DIR=/usr/src/app \
+ENV APP_DIR=/usr/src/app \
     USER_HOME=/home/appuser \
-    JAR_FILE=tweedler-standalone.jar \
+    JAR_FILE=tweedler-1.2.0-standalone.jar \
     PORT=3000 \
     JVM_OPTS=-Dclojure.main.report=stderr
 
-# RUN apk add tree
+# Install shadow-utils (which contains groupadd and useradd)
+RUN microdnf install -y shadow-utils && \
+    microdnf clean all
 
-# Create a group and user
-RUN addgroup -S appgroup && adduser -S appuser -G appgroup
+# Create a group and a user
+RUN groupadd -r appgroup && \
+    useradd -r -g appgroup -d /home/appuser -m -s /bin/bash appuser
 
 USER appuser
 
 WORKDIR ${USER_HOME}
 
-COPY --from=builder ${SRC_DIR}/target/uberjar/${JAR_FILE} ${USER_HOME}/${JAR_FILE}
+COPY --from=builder ${APP_DIR}/target/${JAR_FILE} ${USER_HOME}/${JAR_FILE}
+
+# This is just for troubleshooting purposes
+# RUN microdnf install tree && microdnf clean all
 # RUN tree -L 3
 
 EXPOSE ${PORT}

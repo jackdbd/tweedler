@@ -1,10 +1,13 @@
 .calva/
 .git/
-images/
+
+bb/
+dev/
 target/
 test/
 
-.lein-env
-.lein-repl-history
-.travis.yml
+.envrc
+.nrepl-port
 *.db
+bb.edn
+flake*

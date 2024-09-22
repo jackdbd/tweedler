@@ -1,5 +1,0 @@
-language: clojure
-services:
-    - redis-server
-before_script: lein with-profile dev do clean, javac
-script: lein test-all
