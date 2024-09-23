@@ -28,6 +28,7 @@
       default = pkgs.mkShell {
         packages = with pkgs; [
           babashka # Clojure interpreter for scripting
+          flyctl # Command line tools for fly.io services
           graphviz
           neo-cowsay # just for fun
           sqlite
@@ -38,6 +39,7 @@
           echo "Versions"
           bb --version
           dot --version # one of the tools installed with graphviz
+          fly version
           java --version
 
           export NOT_FOUND_PAGE_REDIRECT_URI="http://localhost:$PORT/";

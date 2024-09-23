@@ -126,16 +126,17 @@
   (def request {})
   (ring-handler request)
 
+  (def port 3000)
   ;; App with atom store
-  (start! {:port 3000})
+  (start! {:port port})
   (stop!)
 
   ;; App with persistent SQLite store
-  (start! {:db-spec {:jdbcUrl (System/getenv "JDBC_DATABASE_URL")} :port 3000})
+  (start! {:db-spec {:jdbcUrl (System/getenv "JDBC_DATABASE_URL")} :port port})
   (stop!)
 
   ;; App with in-memory SQLite store (we need to apply migrations)
-  (start! {:db-spec {:jdbcUrl "jdbc:sqlite::memory:"} :port 3000})
+  (start! {:db-spec {:jdbcUrl "jdbc:sqlite::memory:"} :port port})
   (def config {:store :database :db {:datasource @hikari-ds}})
   (migratus/migrate config)
   (stop!)

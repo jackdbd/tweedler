@@ -1,3 +1,7 @@
 {
-  "recommendations": ["betterthantomorrow.calva"]
+  "recommendations": [
+    "azuretools.vscode-docker",
+    "betterthantomorrow.calva",
+    "tamasfe.even-better-toml"
+  ]
 }

@@ -8,12 +8,9 @@
                 :task (shell "rm -rf target/")}
          container:build {:doc "Build a container image with docker"
                           :task (shell "docker build --tag tweedler:v0.1.0 .")}
-         container:deploy {:depends [container:build]
-                           :doc "Deploy the container image (TODO)"
-                           :task (shell "echo TODO deploy somewhere (Fly.io, Railway)")}
          container:run {:depends [container:build]
                         :doc "Run a container with docker"
-                        :task (shell "docker run -p 3001:3000 tweedler:v0.1.0")}
+                        :task (shell "docker run -p 3001:8080 tweedler:v0.1.0")}
          db:init {:doc "Initialize the database"
                   :task (clojure "-M:migrate init")}
          db:migrate {:depends [db:init]
@@ -27,6 +24,8 @@
                      :task (shell "neil dep search" (first *command-line-args*))}
          dep:upgrade {:doc "Upgrade all dependencies"
                       :task (shell "neil dep upgrade")}
+         deploy {:doc "Deploy the app to Fly.io"
+                 :task (shell "fly deploy")}
          graph {:doc "Generate a graph of dependencies between namespaces"
                 :task (clojure "-X:hiera" :layout :vertical)}
          graph:copy {:depends [graph]

@@ -5,8 +5,8 @@ FROM clojure:tools-deps-bullseye-slim as builder
 
 LABEL maintainer="giacomo@giacomodebidda.com"
 
-ENV APP_DIR=/usr/src/app \
-    JAR_FILE=tweedler-1.2.0-standalone.jar
+ENV APP_DIR="/usr/src/app" \
+    JAR_FILE="tweedler-1.2.0-standalone.jar"
 
 RUN mkdir -p ${APP_DIR}
 
@@ -31,11 +31,12 @@ FROM eclipse-temurin:23_37-jre-ubi9-minimal
 # Red Hat Universal Base Image 9 Minimal uses microdnf as a package manager.
 # https://catalog.redhat.com/software/containers/ubi9/ubi-minimal/615bd9b4075b022acc111bf5
 
-ENV APP_DIR=/usr/src/app \
-    USER_HOME=/home/appuser \
-    JAR_FILE=tweedler-1.2.0-standalone.jar \
-    PORT=3000 \
-    JVM_OPTS=-Dclojure.main.report=stderr
+ENV APP_DIR="/usr/src/app" \
+    USER_HOME="/home/appuser" \
+    JAR_FILE="tweedler-1.2.0-standalone.jar" \
+    PORT=8080 \
+    JDBC_DATABASE_URL="jdbc:sqlite:tweedler_dev.db" \
+    JVM_OPTS="-Dclojure.main.report=stderr"
 
 # Install shadow-utils (which contains groupadd and useradd)
 RUN microdnf install -y shadow-utils && \
