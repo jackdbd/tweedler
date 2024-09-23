@@ -8,8 +8,7 @@
                 :task (shell "rm -rf target/")}
          container:build {:doc "Build a container image with docker"
                           :task (shell "docker build --tag tweedler:v0.1.0 .")}
-         container:run {
-                     ;;    :depends [container:build]
+         container:run {:depends [container:build]
                         :doc "Run a container with docker"
                         :task (shell "docker run -e TURSO_DATABASE_URL -e TURSO_AUTH_TOKEN -p 3001:8080 tweedler:v0.1.0")}
          dep:licenses {:doc "List all licenses of the dependencies"
@@ -19,8 +18,14 @@
                      :task (shell "neil dep search" (first *command-line-args*))}
          dep:upgrade {:doc "Upgrade all dependencies"
                       :task (shell "neil dep upgrade")}
-         deploy {:doc "Deploy the app to Fly.io"
-                 :task (shell "fly deploy --debug --verbose")}
+         fly:deploy {:doc "Deploy the app to Fly.io"
+                     ;; :depends [fly:secrets:set] ;; The deployment depends on the secrets, but we just have to set them once.
+                     :task (shell "fly deploy --debug --verbose")}
+         fly:secrets:list {:doc "List all secrets set on Fly.io"
+                           :task (shell "fly secrets list")}
+         fly:secrets:set {:doc "Sets all necessary secrets on Fly.io"
+                          :task (do (shell [(str "fly secrets set TURSO_DATABASE_URL=" (System/getenv "TURSO_DATABASE_URL"))])
+                                    (shell [(str "fly secrets set TURSO_AUTH_TOKEN=" (System/getenv "TURSO_AUTH_TOKEN"))]))}
          graph {:doc "Generate a graph of dependencies between namespaces"
                 :task (clojure "-X:hiera" :layout :vertical)}
          graph:copy {:depends [graph]
@@ -42,9 +47,9 @@
                         :task (tasks/migrate-turso {:database-url (System/getenv "TURSO_DATABASE_URL")
                                                     :auth-token (System/getenv "TURSO_AUTH_TOKEN")})}
          turso:seed {:depends [turso:migrate]
-                      :doc "Seed Turso with some fakes"
-                      :task (tasks/seed-turso {:database-url (System/getenv "TURSO_DATABASE_URL")
-                                               :auth-token (System/getenv "TURSO_AUTH_TOKEN")})}
+                     :doc "Seed Turso with some fakes"
+                     :task (tasks/seed-turso {:database-url (System/getenv "TURSO_DATABASE_URL")
+                                              :auth-token (System/getenv "TURSO_AUTH_TOKEN")})}
          uberjar:build {:doc "Package the application into an uberjar"
                         :task (clojure "-T:build uber")}
          uberjar:run {:depends [uberjar:build sqlite:migrate turso:migrate]
