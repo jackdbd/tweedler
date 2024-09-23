@@ -7,6 +7,17 @@
             [tweedler.store.protocol :refer [get-tweeds put-tweed! seed-tweeds!]]
             [tweedler.security :refer [escape-html]]))
 
+;; This is just to make clj-kondo happy
+;; https://stackoverflow.com/questions/61727582/how-to-avoid-unresolved-symbol-with-clj-kond-when-using-hugsql-def-db-fns-macro
+(declare
+ csrf-token
+ href
+ index-template
+ not-found-template
+ tweed
+ tweed-template
+ tweeds)
+
 (html/deftemplate not-found-template "templates/404.html"
   [href]
   [:a.home-link] (html/set-attr :href href))

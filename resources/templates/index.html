@@ -1,12 +1,14 @@
 <!doctype html>
-<html>
+<html lang="en-US">
 
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Welcome to Twiddler</title>
-    <link href="css/normalize.css" rel="stylesheet" type="text/css" />
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/skeleton/2.0.4/skeleton.min.css" rel="stylesheet" />
+    <link href="css/normalize.css" rel="stylesheet" type="text/css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/skeleton/2.0.4/skeleton.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Permanent+Marker&display=swap" rel="stylesheet">
-    <link href="css/style.css" rel="stylesheet" type="text/css" />
+    <link href="css/style.css" rel="stylesheet" type="text/css">
     <link rel="apple-touch-icon" sizes="180x180" href="img/apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="32x32" href="img/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="img/favicon-16x16.png">
@@ -25,9 +27,9 @@
                     <form class="new-tweed">
                         <fieldset>
                             <label for="title">Title</label>
-                            <input type="text" name="title" class="u-full-width" required minlength="4" maxlength="50">
+                            <input id="title" type="text" name="title" class="u-full-width" required minlength="4" maxlength="50">
                             <label for="content">Body</label>
-                            <textarea name="content" class="u-full-width" required minlength="1"
+                            <textarea id="content" name="content" class="u-full-width" required minlength="1"
                                 maxlength="200"></textarea>
                             <input class="csrf-token" type="hidden" name="__anti-forgery-token">
                             <input type="submit" class="button-primary">

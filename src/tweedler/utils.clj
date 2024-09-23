@@ -1,7 +1,7 @@
 (ns tweedler.utils
-  "This namespace contains some utility functions.")
+  "Miscellaneous utilities.")
 
 (defmacro docstring
-  "Return the doctring (if any) of a symbol."
+  "Returns the doctring (if any) of a symbol."
   [symbol]
   `(:doc (meta #'~symbol)))

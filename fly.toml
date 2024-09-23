@@ -7,16 +7,25 @@ app = 'tweedler'
 primary_region = 'ams'
 
 [build]
+  dockerfile = "Dockerfile"
+
+[deploy]
+  # https://fly.io/docs/reference/configuration/#run-one-off-commands-before-releasing-a-deployment
+  # release_command = "clj -M:migrate migrate"
+  release_command = "java --version"
+
+[env]
+  TAOENSSO_TIMBRE_MIN_LEVEL_EDN = ":info"
 
 [http_service]
-  internal_port = 8080
-  force_https = true
-  auto_stop_machines = 'stop'
   auto_start_machines = true
+  auto_stop_machines = 'stop'
+  force_https = true
+  internal_port = 8080
   min_machines_running = 0
   processes = ['app']
 
 [[vm]]
-  memory = '512mb'
   cpu_kind = 'shared'
   cpus = 1
+  memory = '512mb'

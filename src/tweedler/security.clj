@@ -1,4 +1,5 @@
 (ns tweedler.security
+  (:require [clojure.java.io :as io])
   (:import [org.owasp.html HtmlPolicyBuilder PolicyFactory]))
 
 (def allowed-elements (doto ^"[Ljava.lang.String;" (make-array String 1)
@@ -23,6 +24,14 @@
                         (.toFactory)))
 
 (defn escape-html
-  "Sanitize the user's input to mitigate XSS attacks."
+  "Sanitizes the user's input to mitigate XSS attacks."
   [^String s]
   (.sanitize ^PolicyFactory policy-factory s))
+
+(comment
+  (def input-html (slurp (io/resource "templates/test-sanitize.html")))
+  (def sanitized-html (escape-html input-html))
+
+  (assert (.contains input-html "<script"))
+  (assert (not (.contains sanitized-html "<script")))
+  )

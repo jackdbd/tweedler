@@ -25,7 +25,7 @@
          dep:upgrade {:doc "Upgrade all dependencies"
                       :task (shell "neil dep upgrade")}
          deploy {:doc "Deploy the app to Fly.io"
-                 :task (shell "fly deploy")}
+                 :task (shell "fly deploy --debug --verbose")}
          graph {:doc "Generate a graph of dependencies between namespaces"
                 :task (clojure "-X:hiera" :layout :vertical)}
          graph:copy {:depends [graph]
