@@ -1,0 +1,11 @@
+{
+  "requests": [
+    {
+      "type": "execute",
+      "stmt": {
+        "sql": "CREATE TABLE IF NOT EXISTS tweed (id TEXT PRIMARY KEY NOT NULL, title TEXT, content TEXT, timestamp_creation TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL)"
+      }
+    },
+    { "type": "close" }
+  ]
+}

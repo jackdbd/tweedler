@@ -35,7 +35,6 @@ ENV APP_DIR="/usr/src/app" \
     USER_HOME="/home/appuser" \
     JAR_FILE="tweedler-1.2.0-standalone.jar" \
     PORT=8080 \
-    JDBC_DATABASE_URL="jdbc:sqlite:tweedler_dev.db" \
     JVM_OPTS="-Dclojure.main.report=stderr"
 
 # Install shadow-utils (which contains groupadd and useradd)

@@ -33,6 +33,7 @@
           neo-cowsay # just for fun
           sqlite
           temurin-bin # Eclipse Temurin, prebuilt OpenJDK binary
+          turso-cli # CLI for Turso (distributed SQLite).
         ];
         shellHook = ''
           cowthink "Welcome to this nix dev shell!" --bold -f tux --rainbow
@@ -41,9 +42,13 @@
           dot --version # one of the tools installed with graphviz
           fly version
           java --version
+          turso --version
 
           export FLY_DEPLOY_TOKEN=$(cat /run/secrets/fly/tokens | jq .deploy | tr -d '"');
           export NOT_FOUND_PAGE_REDIRECT_URI="http://localhost:$PORT/";
+          export TURSO_AUTH_TOKEN=$(cat /run/secrets/turso/tweedler | jq .auth_token | tr -d '"');
+          # turso db show tweedler --http-url
+          export TURSO_DATABASE_URL=$(cat /run/secrets/turso/tweedler | jq .database_url | tr -d '"');
         '';
         JDBC_DATABASE_URL = "jdbc:sqlite:tweedler_dev.db";
         # JDBC_DATABASE_URL = "jdbc:sqlite::memory:";

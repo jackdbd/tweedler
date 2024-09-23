@@ -7,3 +7,10 @@
 
 (hugsql/def-db-fns "sql/tweed.sql"
   {:adapter (next-adapter/hugsql-adapter-next-jdbc)})
+
+(comment 
+  (declare get-tweeds) ;; HugSQL creates symbols from tweed.sql
+
+  (def db-spec {:jdbcUrl (System/getenv "JDBC_DATABASE_URL")})
+  (get-tweeds db-spec)
+  )

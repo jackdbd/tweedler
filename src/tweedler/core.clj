@@ -12,7 +12,8 @@
             [tweedler.routes :refer [app-routes]]
             [tweedler.store.atom :refer [atom-store]]
             [tweedler.store.redis :refer [redis-store-hashes redis-store-list]]
-            [tweedler.store.sqlite :refer [sqlite-store]])
+            [tweedler.store.sqlite :refer [sqlite-store]]
+            [tweedler.store.turso :refer [turso-store]])
   (:import [com.zaxxer.hikari HikariDataSource]
            [org.eclipse.jetty.server Server]))
 
@@ -21,7 +22,7 @@
    (make-atom-handler {:name "Tweedler Atom Store"}))
   ([{:keys [name]
      :or {name "Tweedler Atom Store"}}]
-   (debug "Create atom handler")
+   (debug "Create atom handler" name)
    (-> app-routes
        (wrap-store (atom-store {:name name :atom (atom {:tweeds '()})}))
        (wrap-defaults (assoc-in site-defaults [:security :anti-forgery] true)))))
@@ -47,6 +48,13 @@
   (debug "Create redis list handler")
   (-> app-routes
       (wrap-store (redis-store-list {:redis-key "tweeds"}))
+      (wrap-defaults (assoc-in site-defaults [:security :anti-forgery] true))))
+
+(defn make-turso-handler
+  [{:keys [database-url auth-token]}]
+  (debug "Create Turso handler")
+  (-> app-routes
+      (wrap-store (turso-store {:database-url database-url :auth-token auth-token}))
       (wrap-defaults (assoc-in site-defaults [:security :anti-forgery] true))))
 
 ;; Singleton that acts as the container for the Jetty server (it's stateful: it
@@ -90,15 +98,17 @@
 
 (defn start!
   "Starts the app."
-  [{:keys [db-spec port]
-    :or {db-spec nil port 80}}]
-  (if db-spec
-    (do
-      (create-connection-pool! db-spec) ;; maybe let the datasource handler create the connection pool
-      (let [handler (make-datasource-handler {:datasource @hikari-ds})]
-        (create-and-run-server! {:handler handler :port port})))
-    (let [handler (make-atom-handler)]
-      (create-and-run-server! {:handler handler :port port}))))
+  [{:keys [port store]
+    :or {port 80 store nil}}]
+  (let [handler (cond
+                  (contains? store :sqlite) (do
+                                              (create-connection-pool! (:sqlite store)) ;; maybe let the datasource handler create the connection pool
+                                              (make-datasource-handler {:datasource @hikari-ds}))
+                  (contains? store :turso) (make-turso-handler (:turso store))
+                  (contains? store :atom) (make-atom-handler (:atom store))
+                  :else (throw (ex-info "Unsupported store" {:causes #{:store-not-implemented}
+                                                             :supported-stores #{:atom :sqlite :turso}})))]
+    (create-and-run-server! {:handler handler :port port})))
 
 (defn stop!
   "Stops the app."
@@ -109,8 +119,10 @@
 
 (defn -main
   []
-  (start! {:db-spec {:jdbcUrl (System/getenv "JDBC_DATABASE_URL")}
-           :port (Integer/parseInt (System/getenv "PORT"))}))
+  (start! {:port (Integer/parseInt (System/getenv "PORT"))
+          ;;  :store {:sqlite {:jdbcUrl (System/getenv "JDBC_DATABASE_URL")}}
+           :store {:turso {:database-url (System/getenv "TURSO_DATABASE_URL")
+                           :auth-token (System/getenv "TURSO_AUTH_TOKEN")}}}))
 
 (comment
   (def db-spec {:jdbcUrl (System/getenv "JDBC_DATABASE_URL")})
@@ -119,7 +131,7 @@
   (def conn (jdbc/get-connection @hikari-ds))
   (jdbc/execute! conn ["SELECT * FROM tweed"])
   (destroy-connection-pool!)
-  
+
   (def db-spec {:jdbcUrl (System/getenv "JDBC_DATABASE_URL")})
   (def datasource (connection/->pool HikariDataSource db-spec))
   (def ring-handler (make-datasource-handler {:datasource datasource}))
@@ -128,16 +140,40 @@
 
   (def port 3000)
   ;; App with atom store
-  (start! {:port port})
+  (start! {:store {:atom {:name "My custom store"}}
+           :port port})
   (stop!)
 
   ;; App with persistent SQLite store
-  (start! {:db-spec {:jdbcUrl (System/getenv "JDBC_DATABASE_URL")} :port port})
+  (start! {:store {:sqlite {:jdbcUrl (System/getenv "JDBC_DATABASE_URL")}} 
+           :port port})
   (stop!)
 
-  ;; App with in-memory SQLite store (we need to apply migrations)
-  (start! {:db-spec {:jdbcUrl "jdbc:sqlite::memory:"} :port port})
-  (def config {:store :database :db {:datasource @hikari-ds}})
-  (migratus/migrate config)
+  ;; App with in-memory SQLite store
+  (start! {:store {:sqlite {:jdbcUrl "jdbc:sqlite::memory:"}}
+           :port port})
   (stop!)
+
+  ;; App with Turso
+  (start! {:store {:turso {:database-url (System/getenv "TURSO_DATABASE_URL")
+                           :auth-token (System/getenv "TURSO_AUTH_TOKEN")}}
+           :port port})
+  (stop!)
+
+  ;; Exception: unsupported store
+  (try 
+    (start! {:store {:foo {:color "red"}}
+             :port port})
+    (catch Exception e
+      (ex-data e)))
   )
+
+(comment
+  (defn my-handler
+    [_req]
+    {:body "<h1>hello</h1>" :status 200 :headers {"Content-Type" "text/html"}})
+
+  (def my-ring-app (->
+                    my-handler
+                    (wrap-store (atom-store {:name "My Store"
+                                             :atom (atom {:tweeds '()})})))))

@@ -8,17 +8,12 @@
                 :task (shell "rm -rf target/")}
          container:build {:doc "Build a container image with docker"
                           :task (shell "docker build --tag tweedler:v0.1.0 .")}
-         container:run {:depends [container:build]
+         container:run {
+                     ;;    :depends [container:build]
                         :doc "Run a container with docker"
-                        :task (shell "docker run -p 3001:8080 tweedler:v0.1.0")}
-         db:init {:doc "Initialize the database"
-                  :task (clojure "-M:migrate init")}
-         db:migrate {:depends [db:init]
-                     :doc "Apply all database migrations"
-                     :task (clojure "-M:migrate migrate")}
-         db:seed {:depends [db:migrate]
-                  :doc "Seed the database with some fakes"
-                  :task (clojure "-M:dev --main tweedler.db")}
+                        :task (shell "docker run -e TURSO_DATABASE_URL -e TURSO_AUTH_TOKEN -p 3001:8080 tweedler:v0.1.0")}
+         dep:licenses {:doc "List all licenses of the dependencies"
+                       :task (shell "neil license list")}
          dep:search {:doc "Search a dependency"
                      ;; https://book.babashka.org/#_command_line_arguments
                      :task (shell "neil dep search" (first *command-line-args*))}
@@ -31,14 +26,27 @@
          graph:copy {:depends [graph]
                      :doc "Copy the image of the graph of namespace to resources/img"
                      :task (shell "cp target/hiera/namespaces.png resources/img")}
-         licenses {:doc "List all licenses of the dependencies"
-                   :task (shell "neil license list")}
          serve {:doc "Serve Tweedler"
                 :task (clojure "-M:dev --main tweedler.core")}
+         sqlite:init {:doc "Initialize the SQLite database"
+                      :task (clojure "-M:migrate init")}
+         sqlite:migrate {:depends [sqlite:init]
+                         :doc "Apply all migrations to SQLite"
+                         :task (clojure "-M:migrate migrate")}
+         sqlite:seed {:depends [sqlite:migrate]
+                      :doc "Seed SQLite with some fakes"
+                      :task (clojure "-M:dev --main tweedler.db")}
          tests {:doc "Run all tests"
                 :task (clojure "-M:test")}
+         turso:migrate {:doc "Apply all migrations to Turso"
+                        :task (tasks/migrate-turso {:database-url (System/getenv "TURSO_DATABASE_URL")
+                                                    :auth-token (System/getenv "TURSO_AUTH_TOKEN")})}
+         turso:seed {:depends [turso:migrate]
+                      :doc "Seed Turso with some fakes"
+                      :task (tasks/seed-turso {:database-url (System/getenv "TURSO_DATABASE_URL")
+                                               :auth-token (System/getenv "TURSO_AUTH_TOKEN")})}
          uberjar:build {:doc "Package the application into an uberjar"
                         :task (clojure "-T:build uber")}
-         uberjar:run {:depends [uberjar:build db:migrate]
+         uberjar:run {:depends [uberjar:build sqlite:migrate turso:migrate]
                       :doc "Run the uberjar"
                       :task (shell "java -jar target/tweedler-1.2.0-standalone.jar")}}}
