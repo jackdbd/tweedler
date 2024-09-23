@@ -1,38 +1,42 @@
-name: Example workflow
-on: [push]
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
 jobs:
-  clojure:
+  build-test-deploy:
+    name: Build, test, deploy
+    # https://github.blog/changelog/2021-04-19-github-actions-limit-workflow-run-or-job-concurrency/
+    concurrency: deploy-group # Ensures that only a single instance of this job is running at any given time.
     strategy:
       matrix:
         os: [ubuntu-latest, macOS-latest, windows-latest]
     runs-on: ${{ matrix.os }}
     steps:
-      - name: Checkout
+      - name: 🛎️ Checkout
         uses: actions/checkout@v4
 
       # It's important to install java before installing clojure tools, because
       # clojure tools needs java exclusions: babashka, clj-kondo and cljstyle.
       # https://github.com/marketplace/actions/setup-clojure
       # https://github.com/marketplace/actions/setup-java-jdk
-      - name: Prepare java
+      - name: ☕️ Setup java
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: '21'
 
-      - name: Install clojure tools
+      - name: 🔧 Setup Clojure tools
         uses: DeLaGuardo/setup-clojure@12.5
         with:
-          # Install just one or all simultaneously
-          # The value must indicate a particular version of the tool, or use 'latest'
-          # to always provision the latest version
           cli: 'latest' # Clojure CLI based on tools.deps
           bb: 'latest' # Babashka
-          # clj-kondo: 2022.05.31 # Clj-kondo
-          # cljfmt: 0.10.2 # cljfmt
-          # cljstyle: 0.15.0             # cljstyle
           cmd-exe-workaround: 'latest' # Replaces `clojure` with `deps.clj` on Windows
-          # zprint: 1.2.3                # zprint
           
       # Optional step:
       #  https://github.com/marketplace/actions/cache
@@ -48,14 +52,20 @@ jobs:
           key: cljdeps-${{ hashFiles('deps.edn', 'bb.edn') }}
           restore-keys: cljdeps-
 
-      - name: Execute clojure code
-        run: clojure -e "(+ 1 1)"
-        
-      - name: Build the app as an uberjar
+      - name: 📦 Build the app as an uberjar
         run: bb uberjar:build
         
-      - name: Run all tests
+      - name: 🔍 Run all tests
         run: bb tests
+        env:
+          TAOENSSO_TIMBRE_MIN_LEVEL_EDN: ":warn"
+    
+      - name: ⚙️ Setup flyctl
+        if: ${{ matrix.os }} == 'ubuntu-latest'
+        uses: superfly/flyctl-actions/setup-flyctl@master
 
-    #   - name: Deploy to Fly.io
-    #     run: bb deploy
+      - name: 🌐 Deploy to Fly.io
+        if: ${{ matrix.os }} == 'ubuntu-latest'
+        run: flyctl deploy --remote-only
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}

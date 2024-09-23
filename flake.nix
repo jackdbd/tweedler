@@ -42,6 +42,7 @@
           fly version
           java --version
 
+          export FLY_DEPLOY_TOKEN=$(cat /run/secrets/fly/tokens | jq .deploy | tr -d '"');
           export NOT_FOUND_PAGE_REDIRECT_URI="http://localhost:$PORT/";
         '';
         JDBC_DATABASE_URL = "jdbc:sqlite:tweedler_dev.db";

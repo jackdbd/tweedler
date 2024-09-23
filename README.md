@@ -47,3 +47,5 @@ Generate a graph of dependencies between namespaces using [clj-hiera](https://gi
 ```sh
 bb graph
 ```
+
+[Live logs](Live Logs) on Fly.io.
