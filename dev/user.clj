@@ -1,7 +1,7 @@
 (ns user
   (:require
    [portal.api :as p]
-   [tweedler.utils :refer [escape-html]]))
+   [tweedler.security :refer [escape-html]]))
 
 (comment
   (def portal (p/open {:window-title "Portal UI"}))

@@ -1,7 +1,7 @@
-(ns tweedler.utils-test
+(ns tweedler.security-test
   (:require [clojure.java.io :as io]
             [clojure.test :refer [deftest is testing]]
-            [tweedler.utils :refer [escape-html]]))
+            [tweedler.security :refer [escape-html]]))
 
 (deftest sanitized-html-test
   (let [input-html (slurp (io/resource "templates/test-sanitize.html"))

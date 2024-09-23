@@ -3,9 +3,9 @@
   (:require [markdown.core :refer [md-to-html-string]]
             [net.cgrand.enlive-html :as html]
             [ring.util.response :refer [redirect]]
-            [taoensso.timbre :as timbre :refer [info]]
-            [tweedler.store :refer [get-tweeds put-tweed! seed-tweeds!]]
-            [tweedler.utils :refer [escape-html]]))
+            [taoensso.timbre :as timbre :refer [debug]]
+            [tweedler.store.protocol :refer [get-tweeds put-tweed! seed-tweeds!]]
+            [tweedler.security :refer [escape-html]]))
 
 (html/deftemplate not-found-template "templates/404.html"
   [href]
@@ -35,17 +35,17 @@
   (let [form-params (:form-params req)
         title (get form-params "title")
         content (get-in req [:form-params "content"])]
-    (info "create-tweed [title:" title "; content:" content "]")
+    (debug "create-tweed [title:" title "; content:" content "]")
     (put-tweed! (:store req) {:title (escape-html title) :content (escape-html content)})
-    (info "Redirect to /")
+    (debug "Redirect to /")
     (redirect "/" 302)))
 
 (defn seed-tweeds
   "Seed the store with a few tweeds, then redirect to /."
   [{store :store}]
-  (info "seed-tweeds")
+  (debug "seed-tweeds")
   (seed-tweeds! store)
-  (info "Redirect to /")
+  (debug "Redirect to /")
   (redirect "/" 302))
 
 (defn not-found-handler

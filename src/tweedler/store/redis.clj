@@ -1,9 +1,9 @@
-(ns tweedler.store
-  "This namespace defines the application store and its methods."
+(ns tweedler.store.redis
+  "Store the application state in Redis."
   (:require [nano-id.core :refer [nano-id]]
             [taoensso.carmine :as car]
             [taoensso.timbre :as timbre :refer [debug]]
-            [tweedler.db-fns :as db-fns]))
+            [tweedler.store.protocol :refer [IStore get-tweeds put-tweed!]]))
 
 ; (defn- redis-spec
 ;   "Get the Redis :spec for the current environment.
@@ -21,17 +21,6 @@
   "Connection pool for Redis."
   [& body]
   `(car/wcar server1-conn ~@body))
-
-(defprotocol TweedStore
-  "An abstraction of a store that holds the application's state."
-  (get-tweeds [this] "Retrieve all tweeds from the store.")
-  (put-tweed! [this tweed] "Insert a new tweed in the store.")
-  (reset-tweeds! [this] "Delete all tweeds from the store.")
-  (seed-tweeds! [this] "Seed the store with a few tweeds."))
-
-(defrecord AtomStore [^String name data])
-
-(defrecord SQLiteStore [datasource])
 
 (defrecord RedisStoreList [redis-key])
 
@@ -69,29 +58,7 @@
 ;   [k]
 ;   {:id k :title "TODO title" :content "TODO content" :timestamp "TODO timestamp"})
 
-(extend-protocol TweedStore
-
-  AtomStore
-  (get-tweeds
-    [this]
-    (debug "get-tweeds")
-    (get @(:data this) :tweeds))
-  (put-tweed!
-    [this tweed]
-    (let [{:keys [title content]} tweed]
-      (debug "put-tweed!" "[title:" title "; characters:" (count content) "]")
-      ;; We use conj so the newest Tweed shows up first.
-      (swap! (:data this) update-in [:tweeds] conj tweed)))
-  (reset-tweeds!
-    [this]
-    (debug "reset-tweeds!")
-    (swap! (:data this) assoc-in [:tweeds] []))
-  (seed-tweeds!
-    [this]
-    (debug "seed-tweeds!")
-    (put-tweed! this {:title "First tweed" :content "test content 1"})
-    (put-tweed! this {:title "Second tweed" :content "test content 2"})
-    (put-tweed! this {:title "Third tweed" :content "test content 3"}))
+(extend-protocol IStore
 
   RedisStoreHashes
   (get-tweeds
@@ -152,48 +119,41 @@
     (debug "seed-tweeds!")
     (doseq [_ (range 3)]
       (let [m {:title (format "Fake Title %.3f" (Math/random)) :content "Fake content here"}]
-        (wcar* (car/lpush (:redis-key this) m)))))
+        (wcar* (car/lpush (:redis-key this) m))))))
 
-  SQLiteStore
-  (get-tweeds
-    [this]
-    (debug "get-tweeds")
-    (db-fns/get-tweeds (:datasource this)))
-  (put-tweed!
-    [this tweed]
-    (let [{:keys [title content]} tweed]
-      (debug "put-tweed!" title content)
-      (db-fns/put-tweed! (:datasource this) {:id (nano-id) :title title :content content})))
-  (reset-tweeds!
-    [this]
-    (debug "reset-tweeds!")
-    (db-fns/delete-tweed! (:datasource this)))
-  (seed-tweeds!
-    [this]
-    (debug "seed-tweeds!")
-    (def fake-tweeds [[(nano-id) "Fake title 0" "Fake content 0"]
-                      [(nano-id) "Fake title 1" "Fake content 1"]])
-    (db-fns/seed-tweed! (:datasource this) {:fakes fake-tweeds})))
+;; (defn make-atom-store
+;;   "Instantiate a store that holds some state in an atom."
+;;   [name]
+;;   ; https://guide.clojure.style/#record-constructors
+;;   (->AtomStore name (atom {:tweeds '()})))
 
-(defn make-atom-store
-  "Instantiate a store that holds some state in an atom."
-  [name]
-  ; https://guide.clojure.style/#record-constructors
-  (->AtomStore name (atom {:tweeds '()})))
+;; (defn make-db-store
+;;   "Instantiate a store that holds the app's state in a SQLite database."
+;;   [datasource]
+;;   (->SQLiteStore datasource))
 
-(defn make-db-store
-  "Instantiate a store that holds the app's state in a SQLite database."
-  [datasource]
-  (->SQLiteStore datasource))
-
-(defn make-redis-store-hashes
-  "Store the app's state in multiple Redis hashes.
+(defn redis-store-hashes
+  "Stores the application state in multiple Redis hashes.
    All Redis hashes created by this store will share the same prefix
    `redis-key-prefix` (e.g. my-prefix:, my_prefix_)."
-  [redis-key-prefix]
+  [{:keys [redis-key-prefix]}]
   (->RedisStoreHashes redis-key-prefix))
 
-(defn make-redis-store-list
-  "Store the app's state in a single Redis list key `redis-key`."
-  [redis-key]
+(defn redis-store-list
+  "Stores the application state in a single Redis list key `redis-key`."
+  [{:keys [redis-key]}]
   (->RedisStoreList redis-key))
+
+(comment 
+  (def store (redis-store-hashes {:redis-key-prefix "tweed:"}))
+  (get-tweeds store)
+  (put-tweed! store {:title "Hello" :content "This is my first tweed"})
+  (put-tweed! store {:title "Bye" :content "This is my last tweed"})
+  (get-tweeds store)
+
+  (def store (redis-store-list {:redis-key "tweeds"}))
+  (get-tweeds store)
+  (put-tweed! store {:title "Hello" :content "This is my first tweed"})
+  (put-tweed! store {:title "Bye" :content "This is my last tweed"})
+  (get-tweeds store)
+  )

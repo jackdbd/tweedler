@@ -43,10 +43,14 @@
           export NOT_FOUND_PAGE_REDIRECT_URI="http://localhost:$PORT/";
         '';
         JDBC_DATABASE_URL = "jdbc:sqlite:tweedler_dev.db";
+        # JDBC_DATABASE_URL = "jdbc:sqlite::memory:";
         JVM_OPTS = "-Dclojure.main.report=stderr";
         PORT = 3000;
         REDIS_HOST = "127.0.0.1";
         REDIS_PORT = 6379;
+        # https://github.com/taoensso/timbre/wiki/1-Getting-started#configuration
+        TAOENSSO_TIMBRE_MIN_LEVEL_EDN = ":debug";
+        # TAOENSSO_TIMBRE_MIN_LEVEL_EDN = ":warn";
       };
     });
   };
