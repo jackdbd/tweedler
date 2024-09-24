@@ -3,10 +3,10 @@
             [babashka.curl :as curl]
             [cheshire.core :as json]
             [clojure.java.io :as io]
-            [taoensso.timbre :as timbre :refer [debug]])
-  (:import (java.util UUID)))
+            [taoensso.timbre :as timbre :refer [debug]]
+            ;; [tweedler.store.turso :refer [api-get-tweeds api-seed-tweeds!]]
+            [tweedler.utils :refer [gen-id]]))
   
-
 (defn print-classpath
   []
   (println "=== CLASSPATH BEGIN ===")
@@ -35,26 +35,26 @@
         resp-body (json/parse-string (:body resp) coerce-keys-to-keywords)]
     (prn (:results resp-body))))
 
-(defn delete-tweed-body
+(defn- delete-tweed-body
   []
   (let [sql "DELETE FROM tweed"
         requests [{:type "execute" :stmt {:sql sql}}]]
     (json/generate-string {:requests requests})))
 
-(defn delete-tweed-by-id-body
+(defn- delete-tweed-by-id-body
   [{:keys [id]}]
   (let [sql "DELETE FROM tweed WHERE id = :id"
         named_args [{:name "id" :value {:type "text" :value id}}]
         requests [{:type "execute" :stmt {:sql sql :named_args named_args}}]]
     (json/generate-string {:requests requests})))
 
-(defn get-tweeds-body
+(defn- get-tweeds-body
   []
   (let [sql "SELECT * FROM tweed ORDER BY timestamp_creation DESC"
         requests [{:type "execute" :stmt {:sql sql}}]]
     (json/generate-string {:requests requests})))
 
-(defn put-tweed-body
+(defn- put-tweed-body
   [{:keys [id title content]}]
   (let [sql "INSERT INTO tweed (id, title, content) VALUES (:id, :title, :content)"
         named_args [{:name "id" :value {:type "text" :value id}}
@@ -63,18 +63,31 @@
         requests [{:type "execute" :stmt {:sql sql :named_args named_args}}]]
     (json/generate-string {:requests requests})))
 
-(defn seed-tweeds-body
+(defn- seed-tweeds-body
   []
   (let [sql "INSERT INTO tweed (id, title, content) VALUES (:id, :title, :content)"
-        named_args_one [{:name "id" :value {:type "text" :value (str (UUID/randomUUID))}}
+        named_args_one [{:name "id" :value {:type "text" :value (gen-id)}}
                         {:name "title" :value {:type "text" :value "Fake tweed one"}}
                         {:name "content" :value {:type "text" :value "This is the first fake tweed"}}]
-        named_args_two [{:name "id" :value {:type "text" :value (str (UUID/randomUUID))}}
+        named_args_two [{:name "id" :value {:type "text" :value (gen-id)}}
                         {:name "title" :value {:type "text" :value "Fake tweed two"}}
                         {:name "content" :value {:type "text" :value "This is the second fake tweed"}}]
         requests [{:type "execute" :stmt {:sql sql :named_args named_args_one}}
                   {:type "execute" :stmt {:sql sql :named_args named_args_two}}]]
     (json/generate-string {:requests requests})))
+
+(defn reset-turso
+  [{:keys [auth-token database-url]}]
+  (debug "Reset tweeds in Turso DB" database-url)
+  (let [coerce-keys-to-keywords true
+        url (str database-url "/v2/pipeline")
+        body (delete-tweed-body)
+        resp (curl/post url {:headers {"Authorization" (str "Bearer " auth-token)
+                                       "Content-Type" "application/json"}
+                             :throw false
+                             :body body})
+        resp-body (json/parse-string (:body resp) coerce-keys-to-keywords)]
+    (prn (:results resp-body))))
 
 (defn seed-turso
   [{:keys [auth-token database-url]}]
@@ -91,20 +104,23 @@
 
 (comment
   (print-classpath)
+  (def database-url (System/getenv "TURSO_DATABASE_URL"))
+  (def auth-token (System/getenv "TURSO_AUTH_TOKEN"))
 
-  (migrate-turso {:auth-token (System/getenv "TURSO_AUTH_TOKEN")
-                  :database-url (System/getenv "TURSO_DATABASE_URL")})
+  (migrate-turso {:auth-token auth-token :database-url database-url}) 
+  (reset-turso {:auth-token auth-token :database-url database-url})
+  (seed-turso {:auth-token auth-token :database-url database-url})
 
-  (def url (str (System/getenv "TURSO_DATABASE_URL") "/v2/pipeline"))
+  (def url (str database-url "/v2/pipeline"))
   (def coerce-keys-to-keywords true)
 
-  (def body (seed-tweeds-body))
-  (def body (put-tweed-body {:id (str (UUID/randomUUID))
+  (def id (gen-id))
+  (def body (put-tweed-body {:id id
                              :title "Hello World!"
                              :content "This is my first tweed"}))
   (def body (get-tweeds-body))
   (def body (delete-tweed-body))
-  (def body (delete-tweed-by-id-body {:id "146a0869-b719-4455-bee7-3b3bd9911c38"}))
+  (def body (delete-tweed-by-id-body {:id id}))
 
   (def resp (curl/post url {:headers {"Authorization" (str "Bearer " (System/getenv "TURSO_AUTH_TOKEN"))
                                       "Content-Type" "application/json"}

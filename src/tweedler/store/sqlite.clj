@@ -1,12 +1,12 @@
 (ns tweedler.store.sqlite
   "Store the application state in SQLite."
-  (:require [nano-id.core :refer [nano-id]]
-            [migratus.core :as migratus]
+  (:require [migratus.core :as migratus]
             [next.jdbc :as jdbc]
             [next.jdbc.connection :as connection]
             [taoensso.timbre :as timbre :refer [debug]]
             [tweedler.db-fns :as db-fns]
-            [tweedler.store.protocol :refer [IStore get-tweeds put-tweed!]])
+            [tweedler.store.protocol :refer [IStore get-tweeds put-tweed!]]
+            [tweedler.utils :refer [gen-id]])
   (:import (com.zaxxer.hikari HikariDataSource)))
 
 (defrecord SQLiteStore [^HikariDataSource datasource]
@@ -21,7 +21,7 @@
    [this tweed]
    (let [{:keys [title content]} tweed]
      (debug "put-tweed!" title content)
-     (db-fns/put-tweed! (:datasource this) {:id (nano-id) :title title :content content})))
+     (db-fns/put-tweed! (:datasource this) {:id (gen-id) :title title :content content})))
   
   (reset-tweeds!
    [this]
@@ -31,8 +31,8 @@
   (seed-tweeds!
    [this]
    (debug "seed-tweeds!")
-   (def fake-tweeds [[(nano-id) "Fake title 0" "Fake content 0"]
-                     [(nano-id) "Fake title 1" "Fake content 1"]])
+   (def fake-tweeds [[(gen-id) "Fake title 0" "Fake content 0"]
+                     [(gen-id) "Fake title 1" "Fake content 1"]])
    (db-fns/seed-tweed! (:datasource this) {:fakes fake-tweeds})))
 
 (defn sqlite-store

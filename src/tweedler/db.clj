@@ -1,9 +1,9 @@
 (ns tweedler.db
   "This namespace represents the bridge between the database world and the
    clojure world."
-  (:require [nano-id.core :refer [nano-id]]
-            [next.jdbc :as jdbc]
-            [tweedler.db-fns :as db-fns]))
+  (:require [next.jdbc :as jdbc]
+            [tweedler.db-fns :as db-fns]
+            [tweedler.utils :refer [gen-id]]))
 
 (defn db-get-tweeds
   [db-spec]
@@ -12,8 +12,8 @@
 (defn db-seed
   "Seed the database with some fakes (useful in the REPL)."
   [db-spec]
-  (let [fake-tweeds [[(nano-id) "First fake title" "First fake content"]
-                     [(nano-id) "Second fake title" "Second fake content"]]]
+  (let [fake-tweeds [[(gen-id) "First fake title" "First fake content"]
+                     [(gen-id) "Second fake title" "Second fake content"]]]
     (db-fns/seed-tweed! db-spec {:fakes fake-tweeds})))
 
 (defn -main

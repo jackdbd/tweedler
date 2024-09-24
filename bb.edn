@@ -46,6 +46,9 @@
          turso:migrate {:doc "Apply all migrations to Turso"
                         :task (tasks/migrate-turso {:database-url (System/getenv "TURSO_DATABASE_URL")
                                                     :auth-token (System/getenv "TURSO_AUTH_TOKEN")})}
+         turso:reset {:doc "Reset all tweeds in Turso"
+                        :task (tasks/reset-turso {:database-url (System/getenv "TURSO_DATABASE_URL")
+                                                  :auth-token (System/getenv "TURSO_AUTH_TOKEN")})}
          turso:seed {:depends [turso:migrate]
                      :doc "Seed Turso with some fakes"
                      :task (tasks/seed-turso {:database-url (System/getenv "TURSO_DATABASE_URL")

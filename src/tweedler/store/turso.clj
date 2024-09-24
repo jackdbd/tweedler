@@ -1,9 +1,9 @@
 (ns tweedler.store.turso
-  (:require [nano-id.core :refer [nano-id]]
-            [cheshire.core :as json]
+  (:require [cheshire.core :as json]
             [clj-http.client :as client]
             [taoensso.timbre :as timbre :refer [debug]]
-            [tweedler.store.protocol :refer [IStore get-tweeds put-tweed! reset-tweeds! seed-tweeds!]]))
+            [tweedler.store.protocol :refer [IStore get-tweeds put-tweed! reset-tweeds! seed-tweeds!]]
+            [tweedler.utils :refer [gen-id]]))
 
 (defn delete-tweed-body
   []
@@ -36,10 +36,10 @@
 (defn seed-tweeds-body
   []
   (let [sql "INSERT INTO tweed (id, title, content) VALUES (:id, :title, :content)"
-        named_args_one [{:name "id" :value {:type "text" :value (nano-id)}}
+        named_args_one [{:name "id" :value {:type "text" :value (gen-id)}}
                         {:name "title" :value {:type "text" :value "Fake tweed one"}}
                         {:name "content" :value {:type "text" :value "This is the first fake tweed"}}]
-        named_args_two [{:name "id" :value {:type "text" :value (nano-id)}}
+        named_args_two [{:name "id" :value {:type "text" :value (gen-id)}}
                         {:name "title" :value {:type "text" :value "Fake tweed two"}}
                         {:name "content" :value {:type "text" :value "This is the second fake tweed"}}]
         requests [{:type "execute" :stmt {:sql sql :named_args named_args_one}}
@@ -121,7 +121,7 @@
 
   (put-tweed!
     [{:keys [database-url auth-token]} tweed]
-    (api-put-tweed! {:database-url database-url :auth-token auth-token} (assoc tweed :id (nano-id))))
+    (api-put-tweed! {:database-url database-url :auth-token auth-token} (assoc tweed :id (gen-id))))
 
   (reset-tweeds!
    [{:keys [database-url auth-token]}]
@@ -144,7 +144,7 @@
   (api-seed-tweeds! {:database-url database-url :auth-token auth-token})
   (api-get-tweeds {:database-url database-url :auth-token auth-token})
 
-  (def id (nano-id))
+  (def id (gen-id))
   (api-put-tweed! {:database-url database-url
                    :auth-token auth-token}
                   {:id id

@@ -1,9 +1,9 @@
 (ns tweedler.store.redis
   "Store the application state in Redis."
-  (:require [nano-id.core :refer [nano-id]]
-            [taoensso.carmine :as car]
+  (:require [taoensso.carmine :as car]
             [taoensso.timbre :as timbre :refer [debug]]
-            [tweedler.store.protocol :refer [IStore get-tweeds put-tweed!]]))
+            [tweedler.store.protocol :refer [IStore get-tweeds put-tweed!]]
+            [tweedler.utils :refer [gen-id]]))
 
 ; (defn- redis-spec
 ;   "Get the Redis :spec for the current environment.
@@ -38,7 +38,7 @@
 
 (defn- new-tweed-key
   [prefix]
-  (format "%s%s" prefix (nano-id)))
+  (format "%s%s" prefix (gen-id)))
 
 (defn- redis-keys-by-pattern
   [pattern]
