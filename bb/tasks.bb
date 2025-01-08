@@ -18,7 +18,7 @@
   (println "=== CLASSPATH END ==="))
 
 (defn migrate-turso
-  [{:keys [auth-token database-url]}]
+  [{:keys [database-token database-url]}]
   (debug "Migrate Turso DB" database-url)
   (let [filepath "json/turso/migrations.json"
         coerce-keys-to-keywords true
@@ -28,7 +28,7 @@
                      :requests)
         url (str database-url "/v2/pipeline")
         body (json/generate-string {:requests requests})
-        resp (curl/post url {:headers {"Authorization" (str "Bearer " auth-token)
+        resp (curl/post url {:headers {"Authorization" (str "Bearer " database-token)
                                        "Content-Type" "application/json"}
                              :body body
                              :throw false})
@@ -77,12 +77,12 @@
     (json/generate-string {:requests requests})))
 
 (defn reset-turso
-  [{:keys [auth-token database-url]}]
+  [{:keys [database-token database-url]}]
   (debug "Reset tweeds in Turso DB" database-url)
   (let [coerce-keys-to-keywords true
         url (str database-url "/v2/pipeline")
         body (delete-tweed-body)
-        resp (curl/post url {:headers {"Authorization" (str "Bearer " auth-token)
+        resp (curl/post url {:headers {"Authorization" (str "Bearer " database-token)
                                        "Content-Type" "application/json"}
                              :throw false
                              :body body})
@@ -90,12 +90,12 @@
     (prn (:results resp-body))))
 
 (defn seed-turso
-  [{:keys [auth-token database-url]}]
+  [{:keys [database-token database-url]}]
   (debug "Seed Turso DB" database-url)
   (let [coerce-keys-to-keywords true
         url (str database-url "/v2/pipeline")
         body (seed-tweeds-body)
-        resp (curl/post url {:headers {"Authorization" (str "Bearer " auth-token)
+        resp (curl/post url {:headers {"Authorization" (str "Bearer " database-token)
                                        "Content-Type" "application/json"}
                              :throw false
                              :body body})
@@ -105,11 +105,11 @@
 (comment
   (print-classpath)
   (def database-url (System/getenv "TURSO_DATABASE_URL"))
-  (def auth-token (System/getenv "TURSO_AUTH_TOKEN"))
+  (def database-token (System/getenv "TURSO_DATABASE_TOKEN"))
 
-  (migrate-turso {:auth-token auth-token :database-url database-url}) 
-  (reset-turso {:auth-token auth-token :database-url database-url})
-  (seed-turso {:auth-token auth-token :database-url database-url})
+  (migrate-turso {:database-token database-token :database-url database-url}) 
+  (reset-turso {:database-token database-token :database-url database-url})
+  (seed-turso {:database-token database-token :database-url database-url})
 
   (def url (str database-url "/v2/pipeline"))
   (def coerce-keys-to-keywords true)
@@ -122,7 +122,7 @@
   (def body (delete-tweed-body))
   (def body (delete-tweed-by-id-body {:id id}))
 
-  (def resp (curl/post url {:headers {"Authorization" (str "Bearer " (System/getenv "TURSO_AUTH_TOKEN"))
+  (def resp (curl/post url {:headers {"Authorization" (str "Bearer " (System/getenv "TURSO_DATABASE_TOKEN"))
                                       "Content-Type" "application/json"}
                             :throw false
                             :body body}))

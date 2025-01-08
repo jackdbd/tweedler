@@ -46,7 +46,7 @@
 
           export FLY_DEPLOY_TOKEN=$(cat /run/secrets/fly/tokens | jq .deploy | tr -d '"');
           export NOT_FOUND_PAGE_REDIRECT_URI="http://localhost:$PORT/";
-          export TURSO_AUTH_TOKEN=$(cat /run/secrets/turso/tweedler | jq .auth_token | tr -d '"');
+          export TURSO_DATABASE_TOKEN=$(cat /run/secrets/turso/tweedler | jq .token | tr -d '"');
           # turso db show tweedler --http-url
           export TURSO_DATABASE_URL=$(cat /run/secrets/turso/tweedler | jq .database_url | tr -d '"');
         '';

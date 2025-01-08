@@ -59,11 +59,11 @@
               :accept :json})
 
 (defn api-get-tweeds
-  [{:keys [auth-token database-url]}]
+  [{:keys [database-token database-url]}]
   (debug "get-tweeds")
   (let [coerce-keys-to-keywords true
         url (str database-url "/v2/pipeline")
-        resp (client/post url (merge options {:headers {"Authorization" (str "Bearer " auth-token)}
+        resp (client/post url (merge options {:headers {"Authorization" (str "Bearer " database-token)}
                                               :body (get-tweeds-body)}))
         rows (-> (json/parse-string (:body resp) coerce-keys-to-keywords)
                  :results
@@ -74,11 +74,11 @@
     (map row->m rows)))
 
 (defn api-put-tweed!
-  [{:keys [auth-token database-url]} {:keys [id title content]}]
+  [{:keys [database-token database-url]} {:keys [id title content]}]
   (debug "put-tweed!" {:id id :title title})
   (let [coerce-keys-to-keywords true
         url (str database-url "/v2/pipeline")
-        resp (client/post url (merge options {:headers {"Authorization" (str "Bearer " auth-token)}
+        resp (client/post url (merge options {:headers {"Authorization" (str "Bearer " database-token)}
                                               :body (put-tweed-body {:id id :title title :content content})}))]
     (-> (json/parse-string (:body resp) coerce-keys-to-keywords)
         :results
@@ -87,11 +87,11 @@
         :result)))
 
 (defn api-reset-tweeds!
-  [{:keys [auth-token database-url]}]
+  [{:keys [database-token database-url]}]
   (debug "reset-tweeds!")
   (let [coerce-keys-to-keywords true
         url (str database-url "/v2/pipeline")
-        resp (client/post url (merge options {:headers {"Authorization" (str "Bearer " auth-token)}
+        resp (client/post url (merge options {:headers {"Authorization" (str "Bearer " database-token)}
                                               :body (delete-tweed-body)}))]
     (-> (json/parse-string (:body resp) coerce-keys-to-keywords)
         :results
@@ -100,11 +100,11 @@
         :result)))
 
 (defn api-seed-tweeds!
-  [{:keys [auth-token database-url]}]
+  [{:keys [database-token database-url]}]
   (debug "seed-tweeds!")
   (let [coerce-keys-to-keywords true
         url (str database-url "/v2/pipeline")
-        resp (client/post url (merge options {:headers {"Authorization" (str "Bearer " auth-token)}
+        resp (client/post url (merge options {:headers {"Authorization" (str "Bearer " database-token)}
                                               :body (seed-tweeds-body)}))]
     (-> (json/parse-string (:body resp) coerce-keys-to-keywords)
         :results
@@ -112,47 +112,47 @@
         :response
         :result)))
 
-(defrecord TursoStore [database-url auth-token]
+(defrecord TursoStore [database-url database-token]
   IStore
 
   (get-tweeds
-    [{:keys [database-url auth-token]}]
-    (api-get-tweeds {:database-url database-url :auth-token auth-token}))
+    [{:keys [database-url database-token]}]
+    (api-get-tweeds {:database-url database-url :database-token database-token}))
 
   (put-tweed!
-    [{:keys [database-url auth-token]} tweed]
-    (api-put-tweed! {:database-url database-url :auth-token auth-token} (assoc tweed :id (gen-id))))
+    [{:keys [database-url database-token]} tweed]
+    (api-put-tweed! {:database-url database-url :database-token database-token} (assoc tweed :id (gen-id))))
 
   (reset-tweeds!
-   [{:keys [database-url auth-token]}]
-   (api-reset-tweeds! {:database-url database-url :auth-token auth-token}))
+   [{:keys [database-url database-token]}]
+   (api-reset-tweeds! {:database-url database-url :database-token database-token}))
 
   (seed-tweeds!
-    [{:keys [database-url auth-token]}]
-    (api-seed-tweeds! {:database-url database-url :auth-token auth-token})))
+    [{:keys [database-url database-token]}]
+    (api-seed-tweeds! {:database-url database-url :database-token database-token})))
 
 (defn turso-store
-  [{:keys [database-url auth-token]}]
-  (->TursoStore database-url auth-token))
+  [{:keys [database-url database-token]}]
+  (->TursoStore database-url database-token))
 
 (comment
   (def database-url (System/getenv "TURSO_DATABASE_URL"))
   (def url (str database-url "/v2/pipeline"))
-  (def auth-token (System/getenv "TURSO_AUTH_TOKEN"))
+  (def database-token (System/getenv "TURSO_DATABASE_TOKEN"))
 
-  (api-reset-tweeds! {:database-url database-url :auth-token auth-token})
-  (api-seed-tweeds! {:database-url database-url :auth-token auth-token})
-  (api-get-tweeds {:database-url database-url :auth-token auth-token})
+  (api-reset-tweeds! {:database-url database-url :database-token database-token})
+  (api-seed-tweeds! {:database-url database-url :database-token database-token})
+  (api-get-tweeds {:database-url database-url :database-token database-token})
 
   (def id (gen-id))
   (api-put-tweed! {:database-url database-url
-                   :auth-token auth-token}
+                   :database-token database-token}
                   {:id id
                    :title "Hi there!"
                    :content (str "This is tweed ID " id)})
-  (api-get-tweeds {:database-url database-url :auth-token auth-token})
+  (api-get-tweeds {:database-url database-url :database-token database-token})
 
-  (def store (turso-store {:database-url database-url :auth-token auth-token}))
+  (def store (turso-store {:database-url database-url :database-token database-token}))
   (get-tweeds store)
   (reset-tweeds! store)
   (get-tweeds store)

@@ -10,9 +10,7 @@
                                                                        :git/sha "46a3ac1"
                                                                        :git/url "https://github.com/paulbutcher/clj-migratus"}}
                      :main-opts ["-m" "clj-migratus"]}
-
            :neil {:project {:name tweedler/tweedler}}
-
            :test {:exec-fn cognitect.test-runner.api/test
                   :extra-deps {io.github.cognitect-labs/test-runner {:git/tag "v0.5.1" :git/sha "dfb30dd" :git/url "https://github.com/cognitect-labs/test-runner"}
                                ring/ring-mock {:mvn/version "0.4.0"}}

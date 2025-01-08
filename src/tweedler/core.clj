@@ -51,10 +51,10 @@
       (wrap-defaults (assoc-in site-defaults [:security :anti-forgery] true))))
 
 (defn make-turso-handler
-  [{:keys [database-url auth-token]}]
+  [{:keys [database-url database-token]}]
   (debug "Create Turso handler")
   (-> app-routes
-      (wrap-store (turso-store {:database-url database-url :auth-token auth-token}))
+      (wrap-store (turso-store {:database-url database-url :database-token database-token}))
       (wrap-defaults (assoc-in site-defaults [:security :anti-forgery] true))))
 
 ;; Singleton that acts as the container for the Jetty server (it's stateful: it
@@ -122,7 +122,7 @@
   (start! {:port (Integer/parseInt (System/getenv "PORT"))
           ;;  :store {:sqlite {:jdbcUrl (System/getenv "JDBC_DATABASE_URL")}}
            :store {:turso {:database-url (System/getenv "TURSO_DATABASE_URL")
-                           :auth-token (System/getenv "TURSO_AUTH_TOKEN")}}}))
+                           :database-token (System/getenv "TURSO_DATABASE_TOKEN")}}}))
 
 (comment
   (def db-spec {:jdbcUrl (System/getenv "JDBC_DATABASE_URL")})
@@ -156,7 +156,7 @@
 
   ;; App with Turso
   (start! {:store {:turso {:database-url (System/getenv "TURSO_DATABASE_URL")
-                           :auth-token (System/getenv "TURSO_AUTH_TOKEN")}}
+                           :database-token (System/getenv "TURSO_DATABASE_TOKEN")}}
            :port port})
   (stop!)
 
